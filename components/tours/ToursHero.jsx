@@ -1,0 +1,42 @@
+'use client';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+export default function ToursHero() {
+  const containerRef = useRef(null);
+
+  useGSAP(() => {
+    gsap.fromTo(
+      containerRef.current,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1.4, ease: 'power3.out' }
+    );
+  }, { scope: containerRef });
+
+  return (
+    <section
+      ref={containerRef}
+      className="relative h-[55vh] md:h-[65vh] flex items-center justify-center text-center text-white overflow-hidden"
+    >
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1548685913-fe6678babe8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=90"
+          alt="Iconic Dubai skyline at golden hour"
+          className="w-full h-full object-cover brightness-[0.65]"
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80" />
+
+      <div className="relative z-10 max-w-5xl px-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading mb-6 tracking-tight">
+          Discover Dubai's Best <span className="text-accent-500">Tours & Experiences</span>
+        </h1>
+        <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
+          From Burj Khalifa tickets to private yacht cruises and desert adventures — book your perfect Dubai moment
+        </p>
+      </div>
+    </section>
+  );
+}

@@ -1,15 +1,20 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";  // Import her
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+// Define the fonts with CSS variables (matching your existing --font-heading and --font-body)
+const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",          // Matches your existing variable
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+
 
 export const metadata = {
   title: "Create Next App",
@@ -20,9 +25,19 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+       className={`${inter.variable}  antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"      // Adds 'dark' class to <html>
+          defaultTheme="system"  // Optional: start with system preference
+          enableSystem           // Optional: respect OS setting
+        >
+          <Header />
+          {children}
+          <WhatsAppFloatingButton />  
+          <Footer />
+          
+        </ThemeProvider>
       </body>
     </html>
   );
