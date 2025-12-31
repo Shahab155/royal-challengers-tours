@@ -1,183 +1,163 @@
 "use client";
-import { useState, useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import Image from 'next/image';
+
+import { useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import SectionHeading from "@/components/SectionHeading";
+
+const galleryItems = [
+  {
+    category: "desert",
+    src: "/images/gallery/1.jpg",
+    alt: "Thrilling dune bashing in Dubai desert",
+    title: "Dune Bashing Adventure",
+    aspect: "portrait",
+  },
+  {
+    category: "desert",
+    src: "/images/gallery/2.jpg",
+    alt: "Luxury desert camp under starry sky",
+    title: "Starry Night Camp",
+    aspect: "landscape",
+  },
+  {
+    category: "city",
+    src: "/images/gallery/3.jpg",
+    alt: "Iconic Burj Khalifa at blue hour",
+    title: "Burj Khalifa Blue Hour",
+    aspect: "portrait",
+  },
+  {
+    category: "city",
+    src: "/images/gallery/4.jpg",
+    alt: "Dubai skyline golden sunset",
+    title: "Golden Sunset Skyline",
+    aspect: "landscape",
+  },
+  {
+    category: "cruise",
+    src: "/images/gallery/5.jpg",
+    alt: "Luxury yacht in Dubai Marina",
+    title: "Marina Yacht Experience",
+    aspect: "landscape",
+  },
+  {
+    category: "cruise",
+    src: "/images/gallery/6.jpg",
+    alt: "Sunset cruise with Dubai skyline",
+    title: "Sunset Luxury Cruise",
+    aspect: "portrait",
+  },
+];
 
 export default function Gallery() {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const containerRef = useRef(null);
-  const gridRef = useRef(null);
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const items = [
-    // ... your items array (unchanged)
-    {
-      category: 'desert',
-      src: '/images/gallery/1.jpg',
-      alt: 'Thrilling dune bashing in Dubai desert',
-      title: 'Dune Bashing Thrill',
-    },
-    {
-      category: 'desert',
-      src: '/images/gallery/2.jpg',
-      alt: 'Luxury overnight desert camping under stars',
-      title: 'Starry Night Luxury Camp',
-    },
-    {
-      category: 'city',
-      src: '/images/gallery/3.jpg',
-      alt: 'Iconic Burj Khalifa and Dubai skyline',
-      title: 'Burj Khalifa Views',
-    },
-    {
-      category: 'city',
-      src: '/images/gallery/4.jpg',
-      alt: 'Dubai city skyline at sunset with Burj Khalifa',
-      title: 'Sunset City Skyline',
-    },
-    {
-      category: 'cruise',
-      src: '/images/gallery/5.jpg',
-      alt: 'Luxury yacht cruise in Dubai Marina',
-      title: 'Marina Yacht Experience',
-    },
-    {
-      category: 'cruise',
-      src: '/images/gallery/6.jpg',
-      alt: 'Sunset luxury yacht tour Dubai',
-      title: 'Golden Sunset Cruise',
-    },
-  ];
-
-  const filteredItems = items.filter(
-    (item) => activeFilter === 'all' || item.category === activeFilter
+  const filteredItems = galleryItems.filter(
+    (item) => activeFilter === "all" || item.category === activeFilter
   );
 
-  // Proper GSAP animation with scope and layout handling
-  useGSAP(
-    () => {
-      const items = gsap.utils.toArray('.gallery-item');
-
-      // Initial entrance animation (on mount)
-      gsap.fromTo(
-        items,
-        {
-          opacity: 0,
-          y: 60,
-          scale: 0.95,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.8,
-          stagger: {
-            amount: 0.6,
-            from: "start",
-            ease: "power2.out",
-          },
-          ease: "power3.out",
-        }
-      );
-
-      // On filter change - animate exiting and entering items smoothly
-      if (activeFilter !== 'all') { // Skip on initial load
-        // Fade out removed items
-        gsap.to(items.filter((el) => !filteredItems.some(item => item.title === el.querySelector('p')?.textContent)), {
-          opacity: 0,
-          scale: 0.9,
-          y: -30,
-          duration: 0.4,
-          stagger: 0.05,
-        });
-
-        // Animate in new/current items
-        gsap.fromTo(
-          items,
-          { opacity: 0, y: 40, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.7,
-            stagger: {
-              amount: 0.5,
-              from: "start",
-            },
-            ease: "power3.out",
-            delay: 0.2,
-          }
-        );
-      }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 40, scale: 0.94 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.7, ease: [0.215, 0.61, 0.355, 1] },
     },
-    { scope: containerRef, dependencies: [activeFilter] } // Re-run on filter change
-  );
+    exit: {
+      opacity: 0,
+      scale: 0.92,
+      y: 20,
+      transition: { duration: 0.4 },
+    },
+  };
 
   return (
-    <section ref={containerRef} className="py-16 lg:py-24 bg-[var(--color-bg)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading mb-6">
-            Iconic Dubai Tour Moments
-          </h2>
-          <p className="text-xl text-[var(--color-text-secondary)] max-w-4xl mx-auto">
-            Filter by category to explore thrilling desert adventures, glittering city views, or luxurious cruises.
-          </p>
-        </div>
+    <section className="relative py-20 lg:py-28 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-950/5 to-transparent pointer-events-none" />
+
+      <div className="container mx-auto px-5 md:px-8 lg:px-12 relative z-10">
+        <SectionHeading
+          label="Visual Journey"
+          title="Iconic Dubai Moments"
+          description="Explore breathtaking captures from desert adventures, dazzling cityscapes, and luxurious sea experiences"
+          align="center"
+        />
 
         {/* Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-8 py-3 ${activeFilter === 'all' ? 'btn-primary' : 'btn-outline'}`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setActiveFilter('desert')}
-            className={`px-8 py-3 ${activeFilter === 'desert' ? 'btn-primary' : 'btn-outline'}`}
-          >
-            Desert Adventures
-          </button>
-          <button
-            onClick={() => setActiveFilter('city')}
-            className={`px-8 py-3 ${activeFilter === 'city' ? 'btn-primary' : 'btn-outline'}`}
-          >
-            City Highlights
-          </button>
-          <button
-            onClick={() => setActiveFilter('cruise')}
-            className={`px-8 py-3 ${activeFilter === 'cruise' ? 'btn-primary' : 'btn-outline'}`}
-          >
-            Luxury Cruises
-          </button>
-        </div>
-
-        {/* Gallery Grid */}
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {filteredItems.map((item, index) => (
-            <div
-              key={`${item.category}-${index}`} // Stable key based on content
-              className="gallery-item relative overflow-hidden rounded-2xl shadow-lg group"
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mt-12 mb-16">
+          {[
+            { id: "all", label: "All Moments" },
+            { id: "desert", label: "Desert" },
+            { id: "city", label: "City Vibes" },
+            { id: "cruise", label: "Luxury Cruises" },
+          ].map(({ id, label }) => (
+            <motion.button
+              key={id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setActiveFilter(id)}
+              className={`
+                btn-outline px-8 py-3.5 text-base md:text-lg font-medium
+                ${activeFilter === id 
+                  ? "!bg-accent-500 !text-white !border-transparent shadow-lg shadow-accent-900/30" 
+                  : ""}
+              `}
             >
-              <Image
-                src={item.src}
-                alt={item.alt}
-                width={800}
-                height={600}
-                className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                <p className="font-semibold text-xl text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  {item.title}
-                </p>
-              </div>
-            </div>
+              {label}
+            </motion.button>
           ))}
         </div>
+
+        {/* Masonry Gallery with AnimatePresence */}
+        <motion.div
+          layout // Helps with subtle repositioning
+          className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredItems.map((item) => (
+              <motion.article
+                key={`${item.src}-${item.title}`} // Unique key is crucial!
+                layout // Animate position changes as much as possible
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="break-inside-avoid group relative overflow-hidden rounded-2xl cursor-pointer mb-6"
+              >
+                <div
+                  className={`
+                    relative overflow-hidden rounded-2xl shadow-xl shadow-black/20
+                    transition-all duration-700 group-hover:shadow-2xl group-hover:shadow-black/30
+                    ${item.aspect === "portrait" ? "aspect-[4/5.2]" : "aspect-[4/3]"}
+                  `}
+                >
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    className="object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                   
+                  />
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                  {/* Title glass plate */}
+                  <div className="absolute bottom-0 left-0 right-0 p-7 translate-y-8 group-hover:translate-y-0 transition-all duration-700">
+                    <div className="bg-black/45 backdrop-blur-xl px-6 py-4 rounded-2xl border border-white/10 inline-block">
+                      <h3 className="text-xl md:text-2xl font-heading font-bold text-white tracking-tight">
+                        {item.title}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,134 +1,114 @@
-// components/home/FAQSection.jsx
-'use client';
-import { useRef, useState } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
+"use client";
+
+import { useState } from "react";
+import SectionHeading from "@/components/SectionHeading";
+import { FaPlus, FaMinus, FaRegCommentDots } from "react-icons/fa";
+import Link from "next/link";
+
+const faqs = [
+  {
+    question: "The expense windows adapted sir. Wrong widen drawn.",
+    answer:
+      "Offending belonging promotion provision an be oh consulted ourselves it. Blessing welcomed ladyship she met humoured sir breeding her.",
+  },
+  {
+    question: "Six curiosity day assurance bed necessary?",
+    answer:
+      "Curiosity continual belonging offending so explained it exquisite. Do remember to follow up with clarity.",
+  },
+  {
+    question: "Produce say the ten moments parties?",
+    answer:
+      "Ten moments produce parties in elegance. We ensure every experience is thoughtfully managed.",
+  },
+  {
+    question: "Simple innate summer fat appear basket his desire joy?",
+    answer:
+      "Luxury is about balance. We curate journeys that align with your personal desires.",
+  },
+  {
+    question: "Outward clothes promise at gravity do excited?",
+    answer:
+      "Our premium partners ensure consistent quality and reliable service across all destinations.",
+  },
+];
 
 export default function FAQSection() {
-  const containerRef = useRef(null);
-  const [openIndex, setOpenIndex] = useState(null);
-
-  useGSAP(() => {
-    // Entrance animation for FAQ items
-    gsap.fromTo(
-      containerRef.current.querySelectorAll('.faq-item'),
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    );
-  }, { scope: containerRef });
-
-  const faqs = [
-    {
-      question: "Is booking with Royal Challengers Travelers safe?",
-      answer: "Yes, 100%. We are a fully licensed and insured Dubai travel agency with over 7 years of experience serving international clients. All payments are processed securely, and you receive instant confirmation plus 24/7 support throughout your trip.",
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit/debit cards (Visa, Mastercard, Amex), secure bank transfers, and cash on arrival for local clients. All international transactions are protected with SSL encryption.",
-    },
-    {
-      question: "What is your cancellation and refund policy?",
-      answer: "Free cancellation up to 48 hours before most tours/packages (full refund). Cancellations within 24–48 hours may incur a small fee depending on the experience. Rescheduling is usually free if done 48 hours in advance. Full policy is included in your booking confirmation.",
-    },
-    {
-      question: "Do you offer private or customized tours?",
-      answer: "Absolutely! We specialize in private, luxury, and fully customized experiences — from exclusive desert dinners to private yacht charters. Simply mention your preferences in the booking form or contact us directly.",
-    },
-    {
-      question: "Do you provide hotel/airport transfers?",
-      answer: "Yes, luxury airport transfers and hotel pick-up/drop-off are included in most packages and available as an add-on for tours. We use premium vehicles with professional, English-speaking drivers.",
-    },
-    {
-      question: "What happens if weather affects my desert tour?",
-      answer: "Your safety is our priority. If weather conditions (e.g., heavy rain or sandstorm) make the desert unsafe, we will either reschedule at no extra cost or offer a comparable city-based alternative experience. In rare cases, a full refund is provided.",
-    },
-  ];
-
-  const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section className="py-16 lg:py-24 bg-[var(--color-bg)]">
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading text-[var(--color-text)] mb-5">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-lg md:text-xl text-[var(--color-text-secondary)] max-w-3xl mx-auto leading-relaxed">
-            Quick answers to the most common questions from our international travelers
-          </p>
-        </div>
+    <section className="relative py-24 overflow-hidden">
+      {/* Background wash */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[color:var(--color-surface)] to-transparent" />
 
-        {/* FAQ Accordion */}
-        <div ref={containerRef} className="space-y-5">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className={`faq-item card  overflow-hidden transition-all duration-500 ${
-                openIndex === index
-                  ? 'shadow-xl border border-primary-500'
-                  : 'hover:shadow-lg border-[var(--color-border)]'
-              }`}
-            >
-              {/* Question Button */}
-              <button
-                onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none group"
-              >
-                <span className="text-lg md:text-xl font-medium text-[var(--color-text)] group-hover:text-primary-500 transition-colors">
-                  {faq.question}
-                </span>
+      <div className="relative max-w-7xl mx-auto px-6 grid lg:grid-cols-3 gap-12 items-start">
+        {/* LEFT: FAQ LIST */}
+        <div className="lg:col-span-2">
+          <SectionHeading
+            label="FAQ"
+            title="Frequently Asked Questions"
+            align="left"
+          />
 
-                {/* Plus/Minus Icon with rotation */}
-                <span
-                  className={`text-2xl font-bold text-primary-500 transition-transform duration-500 ${
-                    openIndex === index ? 'rotate-180' : ''
-                  }`}
+          <div className="mt-10 space-y-5">
+            {faqs.map((item, index) => {
+              const isOpen = openIndex === index;
+
+              return (
+                <div
+                  key={index}
+                  className="glass-card rounded-2xl border border-white/10"
                 >
-                  {openIndex === index ? '−' : '+'}
-                </span>
-              </button>
+                  <button
+                    onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                    className="w-full flex items-center justify-between gap-6 px-6 py-5 text-left"
+                  >
+                    <span className="text-lg font-semibold">
+                      {item.question}
+                    </span>
 
-              {/* Answer Content */}
-              <div
-                className={`px-6 overflow-hidden transition-all duration-500 ease-in-out ${
-                  openIndex === index ? 'max-h-96 py-6 opacity-100' : 'max-h-0 py-0 opacity-0'
-                }`}
-              >
-                <p className="text-[var(--color-text-secondary)] leading-relaxed">
-                  {faq.answer}
-                </p>
-              </div>
-            </div>
-          ))}
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-accent-500/40 text-accent-500">
+                      {isOpen ? <FaMinus size={14} /> : <FaPlus size={14} />}
+                    </span>
+                  </button>
+
+                  {/* Answer */}
+                  <div
+                    className={`
+                      px-6 overflow-hidden transition-all duration-500 ease-in-out
+                      ${isOpen ? "max-h-40 pb-6 opacity-100" : "max-h-0 opacity-0"}
+                    `}
+                  >
+                    <p className="text-[color:var(--color-text-secondary)] leading-relaxed">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Final Call to Action */}
-        <div className="text-center mt-12 lg:mt-16">
-          <p className="text-lg text-[var(--color-text-secondary)] mb-6">
-            Still have questions? We’re here to help.
+        {/* RIGHT: CTA CARD */}
+        <div className="glass-card-strong rounded-3xl p-8">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-12 w-12 rounded-xl glass-card flex items-center justify-center border border-accent-500/40">
+              <FaRegCommentDots size={22} className="text-accent-500" />
+            </div>
+            <h3 className="text-2xl font-semibold">
+              Do you have more questions?
+            </h3>
+          </div>
+
+          <p className="text-[color:var(--color-text-secondary)] leading-relaxed mb-8">
+            End-to-end travel planning and luxury experiences in one solution.
+            Our experts are always ready to assist you.
           </p>
-          <a
-            href="/contact"
-            className="btn-outline inline-flex px-10 py-5 text-lg font-semibold"
-          >
-            Contact Us Now
-          </a>
+          <Link href="/contact">
+          <button className="btn-outline w-full py-4 rounded-xl text-base">
+            Contact Us Directly
+          </button>
+          </Link>
         </div>
       </div>
     </section>

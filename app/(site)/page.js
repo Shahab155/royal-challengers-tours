@@ -1,3 +1,6 @@
+import AboutSection from "@/components/AboutSection";
+import CTASection from "@/components/CallToAction";
+import HeroSection from "@/components/CallToAction";
 import ContactSection from "@/components/ContactForm";
 import FAQSection from "@/components/FAQSection";
 import FeaturedPackages from "@/components/FeaturedPakages";
@@ -12,9 +15,12 @@ export default function Home() {
   
   return (
    <>
+  
    <Hero />
-   <Gallery />
+   <AboutSection/>
+   
    <FeaturedPackages />
+   <Gallery/>
    
    <WhyChooseUs
   variant="home"
@@ -24,6 +30,7 @@ export default function Home() {
    <Testimonials />
    <FAQSection />
    <ContactSection />
+   <CTASection/>
    </>
   );
 }

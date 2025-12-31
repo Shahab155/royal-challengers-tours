@@ -1,11 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useMemo } from "react";
-import PackagesList from "@/components/packages/PackagesList";
+import { useEffect, useMemo, useState } from "react";
 import PackagesFilters from "@/components/packages/PackagesFilters";
+import PackagesList from "@/components/packages/PackagesList";
+import PackagesHero from "@/components/packages/PackagesHero";
 
 export default function PackagesPage() {
   const [packages, setPackages] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
@@ -14,7 +17,6 @@ export default function PackagesPage() {
     fetch("/api/packages")
       .then((res) => res.json())
       .then((data) => {
-        // Normalize DB → UI format
         const normalized = data.map((pkg) => ({
           slug: pkg.slug,
           title: pkg.title,
@@ -29,6 +31,17 @@ export default function PackagesPage() {
         }));
 
         setPackages(normalized);
+
+        // derive categories
+        const uniqueCategories = [
+          ...new Set(
+            data
+              .map((p) => p.category_slug)
+              .filter(Boolean)
+          ),
+        ];
+
+        setCategories(uniqueCategories);
       });
   }, []);
 
@@ -48,6 +61,7 @@ export default function PackagesPage() {
 
   return (
     <>
+    <PackagesHero/>
       <PackagesFilters
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -55,7 +69,10 @@ export default function PackagesPage() {
         setActiveCategory={setActiveCategory}
       />
 
-      <PackagesList filteredPackages={filteredPackages} />
+      <PackagesList
+        filteredPackages={filteredPackages}
+        hasCategories={categories.length > 0}
+      />
     </>
   );
 }

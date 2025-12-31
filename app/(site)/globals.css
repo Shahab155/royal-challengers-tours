@@ -1,8 +1,7 @@
-/* css/styles.css */
+/* css/globals.css */
 
 /* Import Tailwind base, components, and utilities */
 @import "tailwindcss";
-
 
 /* Configure your design system with @theme */
 @theme {
@@ -33,7 +32,42 @@
   --color-accent-700: #755923;
   --color-accent-800: #634c1d;
   --color-accent-900: #513f17;
+
+  /* Brand main variables (for easy reference) */
+  --primary: var(--color-primary-500);
+  --accent: var(--color-accent-500);
+
+  /* Glassmorphic gradient backgrounds */
+  --gradient-glass-base: linear-gradient(135deg, 
+    rgba(var(--primary), 0.25) 0%, 
+    rgba(var(--primary), 0.10) 70%, 
+    rgba(var(--accent), 0.20) 100%
+  );
+
+  --gradient-glass-stronger: linear-gradient(135deg, 
+    rgba(var(--primary), 0.30) 0%, 
+    rgba(var(--primary), 0.15) 60%, 
+    rgba(var(--accent), 0.25) 100%
+  );
+
+  /* Existing gradient variations (kept for backward compatibility) */
+  --gradient-primary-accent: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  --gradient-accent-primary: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
   
+  /* Softer / more modern diagonal versions */
+  --gradient-hero: linear-gradient(135deg, #0a2ed4 0%, #b5893a 100%);
+  --gradient-hero-hover: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  
+  /* More premium / subtle metallic feel */
+  --gradient-luxury: linear-gradient(to right, #1e3a8a, var(--accent), #c7a470);
+
+  --gradient-section-dark: linear-gradient(135deg, 
+    var(--color-primary-900) 0%, 
+    var(--color-primary-800) 60%, 
+    rgba(var(--color-accent-900), 0.4) 100%
+  );
+
+  --gradient-section: var(--gradient-section-light);
 }
 
 /* Global Dark/Light Mode Variables */
@@ -46,11 +80,14 @@
 }
 
 .dark {
-  --color-bg: #0f172a;
+  --color-bg: #090d17;
   --color-surface: #1e293b;
   --color-text: #f1f5f9;
   --color-text-secondary: #cbd5e1;
   --color-border: #334155;
+
+  /* Enable dark version of section gradient */
+  --gradient-section: var(--gradient-section-dark);
 }
 
 /* Apply globals */
@@ -73,16 +110,116 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Reusable card component */
 .card {
-  @apply rounded-xl border  p-6 transition-all duration-300;
+  @apply rounded-xl border p-6 transition-all duration-300;
   border-color: var(--color-border);
 }
 
-/* Primary Button (uses primary blue #0822C0) */
+/* Primary Button */
 .btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg bg-primary-500 px-6 py-3 font-semibold text-white transition-all cursor-pointer hover:bg-primary-600 hover:translate-y-[-2px] active:scale-95 shadow-md;
+  @apply inline-flex items-center justify-center rounded-lg bg-primary-500 px-4 py-2  md:px-6 md:py-3 font-semibold text-white transition-all cursor-pointer hover:bg-primary-600 hover:translate-y-[-2px] active:scale-95 shadow-md;
 }
 
-/* Outline Button (uses accent bronze #99732F) */
+/* Outline Button */
 .btn-outline {
-  @apply inline-flex items-center justify-center rounded-lg border-2 border-accent-500 px-6 py-3 font-semibold text-accent-500 transition-all hover:bg-accent-500 hover:text-white active:scale-95;
+  @apply inline-flex items-center justify-center rounded-lg border-2 border-accent-500 cursor-pointer px-4 py-2  md:px-6 md:py-3 font-semibold text-accent-500 transition-all hover:bg-accent-500 hover:text-white active:scale-95;
+}
+
+/* New reusable glassmorphic components */
+.glass-card {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-xl shadow-black/5;
+  background-image: var(--gradient-glass-base);
+}
+
+.glass-card-strong {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-xl shadow-black/5;
+  background-image: var(--gradient-glass-stronger);
+}
+
+/* Dark mode tweaks (optional deeper translucency) */
+.dark .glass-card,
+.dark .glass-card-strong {
+  @apply bg-black/10 shadow-black/20;
+}
+
+/* Pulsing Glow Keyframes - Infinite soft breathing glow */
+@keyframes pulse-glow-1 {
+  0%, 100% {
+    box-shadow: 0 0 20px 8px rgba(8, 34, 191, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px 15px rgba(8, 34, 191, 0.5);
+  }
+}
+
+@keyframes pulse-glow-2 {
+  0%, 100% {
+    box-shadow: 0 0 25px 10px rgba(153, 112, 51, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px 20px rgba(153, 112, 51, 0.4);
+  }
+}
+
+@keyframes pulse-glow-3 {
+  0%, 100% {
+    box-shadow: 0 0 30px 12px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 50px 25px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Animation classes */
+.animate-pulse-glow-1 {
+  animation: pulse-glow-1 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow-2 {
+  animation: pulse-glow-2 5s ease-in-out infinite 1s;
+}
+
+.animate-pulse-glow-3 {
+  animation: pulse-glow-3 6s ease-in-out infinite 2s;
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 2s ease-in-out infinite;
+}
+
+
+/* ============================================= */
+/* Contact Section Gradient Background */
+/* ============================================= */
+.contact-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.6) 10%,
+    var(--primary) 30%,
+    var(--primary) 70%,
+    rgba(255, 255, 255, 0.6) 90%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+}
+
+/* Dark mode adjustment (soft white → deep slate fade) */
+.dark .contact-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.6) 10%,
+    var(--primary) 30%,
+    var(--primary) 70%,
+    rgba(15, 23, 42, 0.6) 90%,
+    rgba(15, 23, 42, 0.95) 100%
+  );
 }

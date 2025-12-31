@@ -1,252 +1,310 @@
 "use client";
-import { useState, useRef } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import Image from 'next/image';
 
-// React Icons Imports
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  HiPhone,
-  HiMail,
-  HiX,
-  HiPlusCircle,
-  
-} from 'react-icons/hi';
-import { HiOutlineHome, HiOutlineBriefcase, HiOutlineGlobeAlt, HiOutlineEnvelope } from 'react-icons/hi2'; // v2 for outline versions
-import { FaFacebookF, FaInstagram, FaXTwitter } from 'react-icons/fa6';
-import Link from 'next/link';
-import ThemeToggle from './ThemeToggle';
+  FaHome,
+  FaSuitcaseRolling,
+  FaMapMarkedAlt,
+  FaPhoneAlt,
+  FaBars,
+  FaTimes,
+  FaCalendarCheck,
+} from "react-icons/fa";
 
-export default function Header() {
-  const [open, setOpen] = useState(false);
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
-  // Refs
-  const topBarRef = useRef(null);
-  const topBarLeftRef = useRef(null);
-  const topBarRightRef = useRef(null);
-  const navTextItemsRef = useRef([]);
-  const bookButtonRef = useRef(null);
-  const mobileMenuRef = useRef(null);
-  const mobileNavItemsRef = useRef([]);
-  const logoRef = useRef(null);
-
-  useGSAP(() => {
-    gsap.fromTo(topBarRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' });
-
-    gsap.fromTo(topBarLeftRef.current, { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 1, ease: 'power3.out', delay: 0.4 });
-
-    gsap.fromTo(topBarRightRef.current, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 1, ease: 'power3.out', delay: 0.6 });
-
-    gsap.fromTo(navTextItemsRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', delay: 0.8 });
-
-    if (bookButtonRef.current) {
-      gsap.fromTo(bookButtonRef.current, { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.4)', delay: 1.2 });
-    }
-
-    gsap.fromTo(logoRef.current, { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.7)', delay: 0.2 });
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useGSAP(() => {
-    if (open) {
-      gsap.fromTo(mobileMenuRef.current, { x: '100%' }, { x: 0, duration: 0.5, ease: 'power3.out' });
+  const navItems = ["Home", "Packages", "Tours", "About", "Contact"];
 
-      gsap.fromTo(mobileNavItemsRef.current, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out', delay: 0.2 });
-    } else if (mobileMenuRef.current) {
-      gsap.to(mobileMenuRef.current, { x: '100%', duration: 0.4, ease: 'power3.in' });
-    }
-  }, [open]);
+  const getHref = (item) => (item === "Home" ? "/" : `/${item.toLowerCase().replace(" ", "-")}`);
 
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-  };
+  const isActive = (path) => pathname === path;
 
   return (
     <>
-      {/* Top Bar */}
-      <div
-        ref={topBarRef}
-        className="hidden md:flex py-2 text-sm font-bold transition-all duration-300 bg-primary-500 dark:bg-[var(--color-surface)] border-b border-primary-600 dark:border-[var(--color-border)]"
+      {/* ==================== DESKTOP & TABLET NAVBAR ==================== */}
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className={`fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-700 ease-in-out hidden lg:block
+          ${
+            scrolled
+              ? "top-0 w-full rounded-none shadow-2xl"
+              : "top-8 w-[90%] max-w-7xl rounded-b-3xl shadow-xl"
+          }
+          ${!scrolled ? "glass-card backdrop-blur-lg border-b border-white/10" : ""}
+          ${scrolled ? "bg-white/95 dark:bg-gray-900/95 supports-[backdrop-filter]:bg-white/80 supports-[backdrop-filter]:dark:bg-gray-900/80" : ""}
+        `}
+        aria-label="Main navigation"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* LEFT: Contact Info */}
-            <div ref={topBarLeftRef} className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-              <a href="tel:+1234567890" className="flex items-center gap-2 hover:underline transition">
-                <HiPhone className="w-5 h-5" />
-                <span>+1 (234) 567-890</span>
-              </a>
-              <a href="mailto:info@royaltravelers.com" className="flex items-center gap-2 hover:underline transition">
-                <HiMail className="w-5 h-5" />
-                <span>info@royaltravelers.com</span>
-              </a>
-            </div>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex items-center justify-between h-20 lg:justify-start">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <Image
+                src="/images/logo-light.png"
+                alt="Royal Travelers"
+                width={150}
+                height={60}
+                className="h-32 w-full object-contain"
+                priority
+              />
+            </Link>
 
-            {/* RIGHT: Offers + Social Icons */}
-            <div ref={topBarRightRef} className="flex items-center gap-6">
-              <span className="hidden md:block">Exclusive Offers Available</span>
-              <div className="flex items-center gap-4">
-                <a href="#" aria-label="Facebook" className="hover:opacity-80 transition">
-                  <FaFacebookF className="w-5 h-5" />
-                </a>
-                <a href="#" aria-label="Instagram" className="hover:opacity-80 transition">
-                  <FaInstagram className="w-5 h-5" />
-                </a>
-                <a href="#" aria-label="X/Twitter" className="hover:opacity-80 transition">
-                  <FaXTwitter className="w-5 h-5" />
-                </a>
-              </div>
+            {/* Desktop Navigation */}
+            <div className="flex items-center space-x-10 ml-auto">
+              {navItems.map((item) => (
+                <motion.div key={item} whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href={getHref(item)}
+                    className={`relative font-extrabold text-lg transition-colors
+                      text-gray-900 dark:text-white
+                      hover:text-primary-500
+                      ${isActive(getHref(item)) ? "after:absolute after:bottom-[-10px] after:left-0 after:w-full after:h-1.5 after:bg-accent-500 after:rounded-full" : ""}
+                    `}
+                  >
+                    {item}
+                  </Link>
+                </motion.div>
+              ))}
+
+              <RippleButton text="Book Now" href="/booking" />
+
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <ThemeToggle />
+              </motion.div>
             </div>
+          </div>
+        </div>
+      </motion.nav>
+
+      {/* ==================== MOBILE NAVBAR ==================== */}
+      {/* Top Mobile Bar: Logo + Menu Toggle */}
+      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className={`px-4 py-2 lg:py-4 transition-all duration-500 ${
+            scrolled
+              ? "bg-white/95 dark:bg-gray-900/95 shadow-lg"
+              : "bg-transparent backdrop-blur-md"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-10" /> {/* Spacer */}
+
+            <Link href="/">
+              <Image
+                src="/images/logo-light.png"
+                alt="Royal Travelers"
+                width={180}                 
+                height={72}
+                className="h-20 md:h-24 w-auto object-contain transition-all duration-300"
+                priority
+              />
+            </Link>
+
+            <div className="flex items-center gap-3">
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <ThemeToggle />
+              </motion.div>
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="p-2 rounded-lg text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-black/20 transition"
+              >
+                <FaBars size={22} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Bottom Navigation Bar - Hidden on ≥786px (md and up) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe-area-inset-bottom">
+        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl border-t border-white/20 dark:border-black/20">
+          <div className="flex items-end justify-between px-3 py-1">
+            {/* Contact */}
+            <Link
+              href="/contact"
+              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
+                isActive("/contact") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              <FaPhoneAlt className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-medium leading-none">Contact</span>
+            </Link>
+
+            {/* Packages */}
+            <Link
+              href="/packages"
+              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
+                isActive("/packages") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              <FaSuitcaseRolling className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-medium leading-none">Packages</span>
+            </Link>
+
+            {/* Home - Center Elevated Button */}
+            <Link
+              href="/"
+              className={`flex flex-col items-center justify-center 
+                w-14 h-14 sm:w-16 sm:h-16 
+                rounded-full shadow-2xl transition-all duration-200
+                ${isActive("/") ? "bg-accent-500 text-white" : "bg-primary-500 text-white"}
+              `}
+            >
+              <FaHome className="w-7 h-7 sm:w-8 sm:h-8" />
+            </Link>
+
+            {/* Tours */}
+            <Link
+              href="/tours"
+              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
+                isActive("/tours") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              <FaMapMarkedAlt className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-medium leading-none">Tours</span>
+            </Link>
+
+            {/* Book Now */}
+            <Link
+              href="/booking"
+              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
+                isActive("/booking") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
+              }`}
+            >
+              <FaCalendarCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-medium leading-none">Book</span>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Header */}
-      <header className="bg-[var(--color-bg)] border-b border-[var(--color-border)] sticky top-0 z-40 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20 ">
-            <Link href="/" className="flex items-center space-x-3 group" ref={logoRef}>
-              <Image
-                src="/images/logo-light.png"
-                alt="Royal Travelers Logo"
-                width={150}
-                height={60}
-                className="group-hover:scale-105 transition"
-              />   
-            </Link>
+      {/* Right Slide-In Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 z-50 lg:hidden"
+            />
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link
-                href="/"
-                className="text-[var(--color-text)] hover:text-primary-500 font-bold transition-colors"
-                ref={(el) => (navTextItemsRef.current[0] = el)}
-              >
-                Home
-              </Link>
-              <Link
-                href="/packages"
-                className="text-[var(--color-text)] hover:text-primary-500 font-bold transition-colors"
-                ref={(el) => (navTextItemsRef.current[1] = el)}
-              >
-                Packages
-              </Link>
-              <Link
-                href="/tours"
-                className="text-[var(--color-text)] hover:text-primary-500 font-bold transition-colors"
-                ref={(el) => (navTextItemsRef.current[2] = el)}
-              >
-                Tours
-              </Link>
-              <Link
-                href="/about"
-                className="text-[var(--color-text)] hover:text-primary-500 font-bold transition-colors"
-                ref={(el) => (navTextItemsRef.current[3] = el)}
-              >
-                About Us
-              </Link>
-              <Link
-                href="/contact"
-                className="text-[var(--color-text)] hover:text-primary-500 font-bold transition-colors"
-                ref={(el) => (navTextItemsRef.current[4] = el)}
-              >
-                Contact
-              </Link>
-              <Link href="/booking" className="btn-primary" ref={bookButtonRef}>
-                Book Now
-              </Link>
-            </nav>
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-0 bottom-0 w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Menu</h2>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <FaTimes size={28} className="text-gray-900 dark:text-white" />
+                  </button>
+                </div>
 
-            {/* Theme Toggle + Hamburger */}
-            <div className="flex items-center space-x-4">
-             <ThemeToggle/>
-            </div>
-          </div>
-        </div>
-      </header>
+                <nav className="space-y-2">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item}
+                      href={getHref(item)}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`block px-5 py-4 rounded-xl text-lg font-semibold transition ${
+                        isActive(getHref(item))
+                          ? "bg-accent-500 text-white"
+                          : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                      }`}
+                    >
+                      {item}
+                    </Link>
+                  ))}
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[var(--color-bg)] border-t border-[var(--color-border)] z-50 lg:hidden shadow-lg">
-        <div className="grid grid-cols-5 py-2">
-          <Link href="/" className="flex flex-col items-center justify-center py-2 text-[var(--color-text)] hover:text-primary-500 transition">
-            <HiOutlineHome className="w-6 h-6" />
-            <span className="text-xs mt-1">Home</span>
-          </Link>
-          <Link href="/packages" className="flex flex-col items-center justify-center py-2 text-[var(--color-text)] hover:text-primary-500 transition">
-            <HiOutlineBriefcase className="w-6 h-6" />
-            <span className="text-xs mt-1">Packages</span>
-          </Link>
-          <Link href="/book" className="flex flex-col items-center justify-center py-2 bg-primary-500 text-white rounded-full -mt-6 shadow-lg">
-            <HiPlusCircle className="w-8 h-8" />
-            <span className="text-xs font-bold mt-1">Book</span>
-          </Link>
-          <Link href="/tours" className="flex flex-col items-center justify-center py-2 text-[var(--color-text)] hover:text-primary-500 transition">
-            <HiOutlineGlobeAlt className="w-6 h-6" />
-            <span className="text-xs mt-1">Tours</span>
-          </Link>
-          <Link href="/contact" className="flex flex-col items-center justify-center py-2 text-[var(--color-text)] hover:text-primary-500 transition">
-            <HiOutlineEnvelope className="w-6 h-6" />
-            <span className="text-xs mt-1">Contact</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Mobile Side Menu */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)}></div>
-          <div ref={mobileMenuRef} className="fixed right-0 top-0 bottom-0 w-80 max-w-full bg-[var(--color-bg)] shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
-              <span className="text-2xl font-bold text-primary-500 font-heading">Royal Travelers</span>
-              <button onClick={() => setOpen(false)} className="p-2 rounded-lg hover:bg-[var(--color-surface)]">
-                <HiX className="w-6 h-6" />
-              </button>
-            </div>
-            <nav className="p-6 space-y-4">
-              <Link
-                href="/"
-                onClick={() => setOpen(false)}
-                className="block text-xl text-[var(--color-text)] hover:text-primary-500 transition-colors"
-                ref={(el) => (mobileNavItemsRef.current[0] = el)}
-              >
-                Home
-              </Link>
-              <Link
-                href="/packages"
-                onClick={() => setOpen(false)}
-                className="block text-xl text-[var(--color-text)] hover:text-primary-500 transition-colors"
-                ref={(el) => (mobileNavItemsRef.current[1] = el)}
-              >
-                Packages
-              </Link>
-              <Link
-                href="/tours"
-                onClick={() => setOpen(false)}
-                className="block text-xl text-[var(--color-text)] hover:text-primary-500 transition-colors"
-                ref={(el) => (mobileNavItemsRef.current[2] = el)}
-              >
-                Tours
-              </Link>
-              <Link
-                href="/about"
-                onClick={() => setOpen(false)}
-                className="block text-xl text-[var(--color-text)] hover:text-primary-500 transition-colors"
-                ref={(el) => (mobileNavItemsRef.current[3] = el)}
-              >
-                About Us
-              </Link>
-              <Link
-                href="/contact"
-                onClick={() => setOpen(false)}
-                className="block text-xl text-[var(--color-text)] hover:text-primary-500 transition-colors"
-                ref={(el) => (mobileNavItemsRef.current[4] = el)}
-              >
-                Contact
-              </Link>
-            </nav>
-          </div>
-        </div>
-      )}
+                  <div className="pt-6">
+                    <RippleButton text="Book Now" href="/booking" mobile />
+                  </div>
+                </nav>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
+  );
+}
+
+// Ripple Button (unchanged)
+function RippleButton({ text, href, mobile = false }) {
+  const buttonRef = useRef(null);
+
+  const createRipple = (event) => {
+    const button = buttonRef.current;
+    if (!button) return;
+
+    const ripple = document.createElement("span");
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    ripple.style.width = ripple.style.height = `${diameter}px`;
+    ripple.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+    ripple.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+    ripple.classList.add("ripple");
+
+    const existingRipple = button.getElementsByClassName("ripple")[0];
+    if (existingRipple) existingRipple.remove();
+
+    button.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 600);
+  };
+
+  return (
+    <motion.div
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.95 }}
+      className={mobile ? "block w-full" : "inline-block"}
+    >
+      <Link
+        href={href}
+        ref={buttonRef}
+        onClick={createRipple}
+        className={`
+          relative overflow-hidden inline-flex items-center justify-center
+          bg-gradient-to-r from-primary-500 to-accent-500 
+          text-white font-bold px-8 py-4 rounded-full 
+          shadow-lg hover:shadow-2xl transition-all duration-500
+          group ${mobile ? "block w-full text-center text-xl py-5" : ""}
+        `}
+      >
+        <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
+        </span>
+        <span className="relative z-10">{text}</span>
+      </Link>
+    </motion.div>
   );
 }

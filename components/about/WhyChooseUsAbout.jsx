@@ -1,11 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const features = [
   {
@@ -47,92 +43,118 @@ const features = [
 ];
 
 export default function WhyChooseUs() {
-  const sectionRef = useRef(null);
-  const titleRef = useRef(null);
-  const cardsRef = useRef(null);
-
-  useGSAP(() => {
-    // Title animation
-    gsap.fromTo(
-      titleRef.current,
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 85%',
-        },
-      }
-    );
-
-    // Cards stagger animation
-    gsap.fromTo(
-      gsap.utils.toArray('.feature-card'),
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: cardsRef.current,
-          start: 'top 80%',
-        },
-      }
-    );
-  }, { scope: sectionRef });
-
   return (
-    <section
-      ref={sectionRef}
-      className="py-20 lg:py-28 bg-gradient-to-br from-[var(--color-primary-900)] via-[var(--color-primary-700)] to-[var(--color-accent-900)]/40"
-    >
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+    <section className="
+      py-20 lg:py-28 
+      relative overflow-hidden 
+      transition-all duration-700
+      dark:bg-blue-600 
+      bg-blue-50
+    ">
+      {/* Subtle overlay for depth - adapts to theme */}
+      <div className="
+        absolute inset-0 pointer-events-none 
+        dark:bg-gradient-to-b dark:from-blue-700/20 dark:to-blue-900/40
+        bg-primary-500 to-transparent
+      " />
+
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div ref={titleRef} className="text-center mb-16 lg:mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold font-heading text-white mb-6 tracking-tight">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="text-center mb-16 lg:mb-20"
+        >
+          <h2 className="
+            text-4xl md:text-5xl font-bold font-heading mb-6 tracking-tight
+            dark:text-white text-blue-900
+          ">
             The Royal Challengers Difference
           </h2>
-          <p className="text-lg md:text-xl text-[var(--color-primary-200)] max-w-3xl mx-auto leading-relaxed">
+          <p className="
+            text-lg md:text-xl max-w-3xl mx-auto leading-relaxed
+            dark:text-blue-100 text-blue-700
+          ">
             We go beyond ordinary tours — delivering personalized, safe, and exceptional Dubai experiences every time.
           </p>
-        </div>
+        </motion.div>
 
         {/* Features Grid */}
-        <div
-          ref={cardsRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
-              className="feature-card rounded-2xl bg-transparent group hover:shadow-2xl hover:shadow-[var(--color-primary-500)]/30 text-white backdrop-blur-xl border border-white/20 dark:border-white hover:-translate-y-2 transition-all duration-300"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{
+                duration: 0.7,
+                delay: index * 0.15,
+                ease: "easeOut"
+              }}
+              whileHover={{ y: -8 }}
+              className="group"
             >
-              <div className="flex flex-col items-center text-center p-6 lg:p-8">
-                <div className="mb-6  transition-transform group-hover:scale-110 duration-300">
-                  {feature.icon}
+              <div className="
+                rounded-2xl h-full
+                backdrop-blur-xl shadow-2xl
+                border transition-all duration-500
+                dark:bg-white/10 dark:border-white/30
+                bg-white/70 border-blue-200/50
+                group-hover:shadow-3xl
+                group-hover:dark:shadow-blue-400/30 group-hover:shadow-blue-300/40
+                group-hover:dark:border-white/50 group-hover:border-blue-300/70
+              ">
+                <div className="flex flex-col items-center text-center p-6 lg:p-8">
+                  <motion.div
+                    className="
+                      mb-6
+                      dark:text-blue-300 text-blue-600
+                    "
+                    whileHover={{ scale: 1.15 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {feature.icon}
+                  </motion.div>
+                  <h3 className="
+                    text-xl font-semibold font-heading mb-4
+                    dark:text-white text-blue-900
+                  ">
+                    {feature.title}
+                  </h3>
+                  <p className="
+                    text-base leading-relaxed
+                    dark:text-blue-50 text-blue-800/80
+                  ">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold font-heading  mb-4">
-                  {feature.title}
-                </h3>
-                <p className=" text-base leading-relaxed">
-                  {feature.description}
-                </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16 lg:mt-20">
-          <button className="btn-outline px-10 py-4 text-lg font-semibold shadow-lg">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="text-center mt-16 lg:mt-20"
+        >
+          <Link href={"/tours"}>
+          <button className=" cursor-pointer
+            px-10 py-4 text-lg font-semibold shadow-lg transition-all duration-300
+            dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-blue-600
+            border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white
+            bg-transparent border-2 rounded-lg
+          ">
             Discover Our Tours
           </button>
-        </div>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

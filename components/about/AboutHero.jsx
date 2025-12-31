@@ -2,6 +2,7 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
 
 export default function AboutHero() {
   const containerRef = useRef(null);
@@ -25,12 +26,14 @@ export default function AboutHero() {
       className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] flex items-center justify-center overflow-hidden"
     >
       <div className="absolute inset-0">
-        <img
-          src="https://images.pexels.com/photos/19894545/pexels-photo-19894545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          alt="Dubai skyline with Burj Khalifa at golden hour sunset"
-          className="w-full h-full object-cover"
-        />
-      </div>
+              <Image
+                src="/images/hero-section.png"
+                alt="Iconic Dubai skyline at golden hour"
+                width={800}
+                height={500}
+                className="w-full h-full object-cover brightness-[0.65]"
+              />
+            </div>
 
       <div className="absolute inset-0 bg-black/45"></div>
 

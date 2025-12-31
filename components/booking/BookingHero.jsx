@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
 
 export default function BookingHero() {
   const containerRef = useRef(null);
@@ -18,15 +19,17 @@ export default function BookingHero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[60vh] md:h-[70vh] flex items-center justify-center text-center text-white overflow-hidden"
+      className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] flex items-center justify-center text-center text-white overflow-hidden"
     >
       <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1548685913-fe6678babe8d?w=2340&q=90&auto=format"
-          alt="Stunning Dubai skyline at sunset – your luxury journey begins"
-          className="w-full h-full object-cover brightness-[0.6]"
-        />
-      </div>
+              <Image
+                src="/images/hero-section.png"
+                alt="Iconic Dubai skyline at golden hour"
+                width={800}
+                height={500}
+                className="w-full h-full object-cover brightness-[0.65]"
+              />
+            </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80" />
 

@@ -26,7 +26,7 @@ export async function POST(request) {
 /* ================= FETCH ALL (ADMIN) ================= */
 export async function GET() {
   const [rows] = await db.query(
-    "SELECT * FROM contact_queries ORDER BY created_at DESC"
+    "SELECT * FROM contact_queries ORDER BY createdAt DESC"
   );
 
   return Response.json(rows);
