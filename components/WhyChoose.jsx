@@ -122,7 +122,7 @@ export default function WhyChooseUs() {
 
                   {/* Text */}
                   <div>
-                    <h4 className="text-lg font-semibold mb-1">
+                    <h4 className="text-lg font-bold mb-1">
                       {item.title}
                     </h4>
                     <p className="text-sm leading-relaxed text-text-secondary">
