@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -39,7 +39,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ==================== DESKTOP & TABLET NAVBAR (UNCHANGED - Logo on Left) ==================== */}
+      {/* ==================== DESKTOP & TABLET NAVBAR ==================== */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -57,10 +57,9 @@ export default function Navbar() {
       >
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between h-20 lg:justify-start">
-            {/* Desktop Logo - Left Aligned (Same as Original) */}
+            {/* Desktop Logo - Left Aligned */}
             <Link href="/" className="flex-shrink-0 relative">
               <div className="relative h-32 w-auto">
-                {/* Light Logo */}
                 <Image
                   src="/images/logo-light.png"
                   alt="Royal Travelers"
@@ -71,7 +70,6 @@ export default function Navbar() {
                   `}
                   priority
                 />
-                {/* Dark Logo */}
                 <Image
                   src="/images/logo-dark.png"
                   alt="Royal Travelers"
@@ -102,7 +100,22 @@ export default function Navbar() {
                 </motion.div>
               ))}
 
-              <RippleButton text="Book Now" href="/booking" />
+              {/* Clean Book Now Button - No Ripple */}
+              <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/booking"
+                  className="relative overflow-hidden inline-flex items-center justify-center
+                    bg-gradient-to-r from-primary-500 to-accent-500 
+                    text-white font-bold px-8 py-4 rounded-full 
+                    shadow-lg hover:shadow-2xl transition-all duration-500
+                    group"
+                >
+                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
+                  </span>
+                  <span className="relative z-10">Book Now</span>
+                </Link>
+              </motion.div>
 
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <ThemeToggle />
@@ -112,29 +125,26 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* ==================== MOBILE NAVBAR - Centered & Larger Logo ==================== */}
+      {/* ==================== MOBILE NAVBAR ==================== */}
       <div className="fixed top-0 left-0 right-0 z-50 lg:hidden">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`px-4 md:py-3 transition-all duration-500 ${
+          className={`px-4 py-3 transition-all duration-500 ${
             scrolled  
               ? "bg-white/95 dark:bg-gray-900/95 shadow-lg"
               : "bg-transparent backdrop-blur-md"
           }`}
         >
           <div className="flex items-center justify-between">
-            {/* Left: Theme Toggle */}
             <div className="flex items-center">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <ThemeToggle />
               </motion.div>
             </div>
 
-            {/* Centered Larger Logo */}
             <Link href="/" className="flex-shrink-0 relative">
-              <div className="relative h-24  md:h-28 w-auto"> {/* Larger on mobile */}
-                {/* Light Logo */}
+              <div className="relative h-24 md:h-28 w-auto">
                 <Image
                   src="/images/logo-light.png"
                   alt="Royal Travelers"
@@ -145,7 +155,6 @@ export default function Navbar() {
                   `}
                   priority
                 />
-                {/* Dark Logo */}
                 <Image
                   src="/images/logo-dark.png"
                   alt="Royal Travelers"
@@ -159,7 +168,6 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Right: Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="p-2 rounded-lg text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-black/20 transition"
@@ -170,7 +178,7 @@ export default function Navbar() {
         </motion.div>
       </div>
 
-      {/* Bottom Navigation Bar - Mobile Only */}
+      {/* Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe-area-inset-bottom">
         <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl border-t border-white/20 dark:border-black/20">
           <div className="flex items-end justify-between px-3 py-1">
@@ -247,8 +255,23 @@ export default function Navbar() {
                     </Link>
                   ))}
 
+                  {/* Clean Book Now Button in Mobile Menu - No Ripple */}
                   <div className="pt-6">
-                    <RippleButton text="Book Now" href="/booking" mobile />
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="block w-full">
+                      <Link
+                        href="/booking"
+                        className="relative overflow-hidden block w-full text-center text-xl py-5
+                          bg-gradient-to-r from-primary-500 to-accent-500 
+                          text-white font-bold rounded-full 
+                          shadow-lg hover:shadow-2xl transition-all duration-500
+                          group"
+                      >
+                        <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
+                        </span>
+                        <span className="relative z-10">Book Now</span>
+                      </Link>
+                    </motion.div>
                   </div>
                 </nav>
               </div>
@@ -257,57 +280,5 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-// Ripple Button (unchanged)
-function RippleButton({ text, href, mobile = false }) {
-  const buttonRef = useRef(null);
-
-  const createRipple = (event) => {
-    const button = buttonRef.current;
-    if (!button) return;
-
-    const ripple = document.createElement("span");
-    const diameter = Math.max(button.clientWidth, button.clientHeight);
-    const radius = diameter / 2;
-
-    ripple.style.width = ripple.style.height = `${diameter}px`;
-    ripple.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
-    ripple.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
-    ripple.classList.add("ripple");
-
-    const existingRipple = button.getElementsByClassName("ripple")[0];
-    if (existingRipple) existingRipple.remove();
-
-    button.appendChild(ripple);
-
-    setTimeout(() => ripple.remove(), 600);
-  };
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.08 }}
-      whileTap={{ scale: 0.95 }}
-      className={mobile ? "block w-full" : "inline-block"}
-    >
-      <Link
-        href={href}
-        ref={buttonRef}
-        onClick={createRipple}
-        className={`
-          relative overflow-hidden inline-flex items-center justify-center
-          bg-gradient-to-r from-primary-500 to-accent-500 
-          text-white font-bold px-8 py-4 rounded-full 
-          shadow-lg hover:shadow-2xl transition-all duration-500
-          group ${mobile ? "block w-full text-center text-xl py-5" : ""}
-        `}
-      >
-        <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
-        </span>
-        <span className="relative z-10">{text}</span>
-      </Link>
-    </motion.div>
   );
 }
