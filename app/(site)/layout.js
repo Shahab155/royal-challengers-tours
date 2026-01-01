@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import  Header  from "@/components/Header";
 import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 
 // Define the fonts with CSS variables (matching your existing --font-heading and --font-body)
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
           >
          <Header />
           {children}
+          <WhatsAppButton />
           <Footer />
           
         </ThemeProvider>

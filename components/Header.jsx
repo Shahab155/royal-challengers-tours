@@ -35,9 +35,11 @@ export default function Navbar() {
 
   const isActive = (path) => pathname === path;
 
+  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+
   return (
     <>
-      {/* ==================== DESKTOP & TABLET NAVBAR ==================== */}
+      {/* ==================== DESKTOP & TABLET NAVBAR (UNCHANGED - Logo on Left) ==================== */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -55,16 +57,32 @@ export default function Navbar() {
       >
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-between h-20 lg:justify-start">
-            {/* Logo */}
-            <Link href="/" className="flex-shrink-0">
-              <Image
-                src="/images/logo-light.png"
-                alt="Royal Travelers"
-                width={150}
-                height={60}
-                className="h-32 w-full object-contain"
-                priority
-              />
+            {/* Desktop Logo - Left Aligned (Same as Original) */}
+            <Link href="/" className="flex-shrink-0 relative">
+              <div className="relative h-32 w-auto">
+                {/* Light Logo */}
+                <Image
+                  src="/images/logo-light.png"
+                  alt="Royal Travelers"
+                  width={150}
+                  height={128}
+                  className={`h-full w-auto object-contain transition-opacity duration-500
+                    ${scrolled || !isDark ? "opacity-100" : "opacity-0"}
+                  `}
+                  priority
+                />
+                {/* Dark Logo */}
+                <Image
+                  src="/images/logo-dark.png"
+                  alt="Royal Travelers"
+                  width={150}
+                  height={128}
+                  className={`absolute inset-0 h-full w-auto object-contain transition-opacity duration-500
+                    ${!scrolled && isDark ? "opacity-100" : "opacity-0"}
+                  `}
+                  priority
+                />
+              </div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -94,103 +112,88 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* ==================== MOBILE NAVBAR ==================== */}
-      {/* Top Mobile Bar: Logo + Menu Toggle */}
+      {/* ==================== MOBILE NAVBAR - Centered & Larger Logo ==================== */}
       <div className="fixed top-0 left-0 right-0 z-50 lg:hidden">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`px-4 py-2 lg:py-4 transition-all duration-500 ${
-            scrolled
+          className={`px-4 md:py-3 transition-all duration-500 ${
+            scrolled  
               ? "bg-white/95 dark:bg-gray-900/95 shadow-lg"
               : "bg-transparent backdrop-blur-md"
           }`}
         >
           <div className="flex items-center justify-between">
-            <div className="w-10" /> {/* Spacer */}
-
-            <Link href="/">
-              <Image
-                src="/images/logo-light.png"
-                alt="Royal Travelers"
-                width={180}                 
-                height={72}
-                className="h-20 md:h-24 w-auto object-contain transition-all duration-300"
-                priority
-              />
-            </Link>
-
-            <div className="flex items-center gap-3">
+            {/* Left: Theme Toggle */}
+            <div className="flex items-center">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <ThemeToggle />
               </motion.div>
-              <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="p-2 rounded-lg text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-black/20 transition"
-              >
-                <FaBars size={22} />
-              </button>
             </div>
+
+            {/* Centered Larger Logo */}
+            <Link href="/" className="flex-shrink-0 relative">
+              <div className="relative h-24  md:h-28 w-auto"> {/* Larger on mobile */}
+                {/* Light Logo */}
+                <Image
+                  src="/images/logo-light.png"
+                  alt="Royal Travelers"
+                  width={200}
+                  height={110}
+                  className={`h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
+                    ${scrolled || !isDark ? "opacity-100" : "opacity-0"}
+                  `}
+                  priority
+                />
+                {/* Dark Logo */}
+                <Image
+                  src="/images/logo-dark.png"
+                  alt="Royal Travelers"
+                  width={200}
+                  height={110}
+                  className={`absolute inset-0 h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
+                    ${!scrolled && isDark ? "opacity-100" : "opacity-0"}
+                  `}
+                  priority
+                />
+              </div>
+            </Link>
+
+            {/* Right: Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 rounded-lg text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-black/20 transition"
+            >
+              <FaBars size={24} />
+            </button>
           </div>
         </motion.div>
       </div>
 
-      {/* Bottom Navigation Bar - Hidden on ≥786px (md and up) */}
+      {/* Bottom Navigation Bar - Mobile Only */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe-area-inset-bottom">
         <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl border-t border-white/20 dark:border-black/20">
           <div className="flex items-end justify-between px-3 py-1">
-            {/* Contact */}
-            <Link
-              href="/contact"
-              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
-                isActive("/contact") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
+            <Link href="/contact" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/contact") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
               <FaPhoneAlt className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-medium leading-none">Contact</span>
             </Link>
 
-            {/* Packages */}
-            <Link
-              href="/packages"
-              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
-                isActive("/packages") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
+            <Link href="/packages" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/packages") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
               <FaSuitcaseRolling className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-medium leading-none">Packages</span>
             </Link>
 
-            {/* Home - Center Elevated Button */}
-            <Link
-              href="/"
-              className={`flex flex-col items-center justify-center 
-                w-14 h-14 sm:w-16 sm:h-16 
-                rounded-full shadow-2xl transition-all duration-200
-                ${isActive("/") ? "bg-accent-500 text-white" : "bg-primary-500 text-white"}
-              `}
-            >
+            <Link href="/" className={`flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl transition-all duration-200 ${isActive("/") ? "bg-accent-500 text-white" : "bg-primary-500 text-white"}`}>
               <FaHome className="w-7 h-7 sm:w-8 sm:h-8" />
             </Link>
 
-            {/* Tours */}
-            <Link
-              href="/tours"
-              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
-                isActive("/tours") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
+            <Link href="/tours" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/tours") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
               <FaMapMarkedAlt className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-medium leading-none">Tours</span>
             </Link>
 
-            {/* Book Now */}
-            <Link
-              href="/booking"
-              className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${
-                isActive("/booking") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"
-              }`}
-            >
+            <Link href="/booking" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/booking") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
               <FaCalendarCheck className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-medium leading-none">Book</span>
             </Link>
@@ -198,7 +201,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Right Slide-In Menu */}
+      {/* Mobile Slide-In Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
