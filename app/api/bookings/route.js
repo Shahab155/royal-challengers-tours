@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { sendBookingEmail } from "@/lib/sendBookingEmail";
 
 /* ================= CREATE BOOKING ================= */
 export async function POST(req) {
@@ -22,8 +23,9 @@ export async function POST(req) {
       );
     }
 
+    // 1️⃣ Save to database
     await db.query(
-      `INSERT INTO bookings 
+      `INSERT INTO bookings
       (booking_type, item_id, item_title, full_name, email, phone, travel_date, travelers, message)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -38,6 +40,23 @@ export async function POST(req) {
         message || null,
       ]
     );
+
+    // 2️⃣ Send email (non-blocking safety)
+    try {
+      await sendBookingEmail({
+        bookingType,
+        itemTitle,
+        fullName,
+        email,
+        phone,
+        travelDate,
+        travelers,
+        message,
+      });
+    } catch (emailError) {
+      console.error("EMAIL ERROR:", emailError);
+      // DO NOT fail booking if email fails
+    }
 
     return Response.json({ success: true });
   } catch (error) {

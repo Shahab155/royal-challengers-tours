@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
 export const { handlers, auth } = NextAuth({
+  trustHost: true,
   providers: [
     Credentials({
       async authorize(credentials) {

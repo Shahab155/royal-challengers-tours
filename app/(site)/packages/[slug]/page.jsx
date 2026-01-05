@@ -95,7 +95,7 @@ export default function PackageDetailPage() {
   return (
     <main className="bg-gray-50 min-h-screen">
       {/* ================= HERO ================= */}
-      <section className="relative h-[60vh] md:h-[70vh]">
+      <section className="relative h-[60vh] md:h-[70vh] lg:h-[80vh]">
         <Image
           src={
             pkg.image

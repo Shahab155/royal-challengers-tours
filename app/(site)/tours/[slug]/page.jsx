@@ -59,7 +59,7 @@ export default async function TourDetailPage({ params }) {
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       {/* ================= HERO ================= */}
-      <section className="relative h-[60vh] md:h-[70vh]">
+      <section className="relative h-[60vh] md:h-[70vh] lg:h-[80vh]">
         <Image
           src={
             tour.image

@@ -5,8 +5,20 @@ import { useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { z } from "zod";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const bookingSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  phone: z.string().min(8, "Phone number is too short"),
+  bookingType: z.string().min(1, "Please select a booking type"),
+  itemTitle: z.string().min(1, "Please select a package or tour"),
+  travelers: z.coerce.number().min(1, "At least 1 traveler required"),
+  travelDate: z.string().optional().nullable(),
+  message: z.string().optional().nullable(),
+});
 
 export default function BookingForm() {
   const formRef = useRef(null);
@@ -15,16 +27,25 @@ export default function BookingForm() {
   const typeFromUrl = searchParams.get("type");
   const slugFromUrl = searchParams.get("slug");
 
-  const [bookingType, setBookingType] = useState(typeFromUrl || "");
+  const isPrefilled = Boolean(typeFromUrl && slugFromUrl);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    travelDate: "",
+    travelers: "2",
+    message: "",
+  });
+
+  const [bookingType, setBookingType] = useState(isPrefilled ? typeFromUrl || "" : "");
   const [selectedItem, setSelectedItem] = useState("");
   const [packages, setPackages] = useState([]);
   const [tours, setTours] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [formError, setFormError] = useState(null);
-
-  const isPrefilled = Boolean(typeFromUrl && slugFromUrl);
+  const [errors, setErrors] = useState({});
 
   // Animation
   useGSAP(() => {
@@ -50,12 +71,11 @@ export default function BookingForm() {
           fetch("/api/admin/tours"),
         ]);
 
-    
         const [pkgData, tourData] = await Promise.all([
           pkgRes.json(),
           tourRes.json(),
         ]);
-     console.log("Package:", pkgRes)
+
         setPackages(Array.isArray(pkgData) ? pkgData : []);
         setTours(Array.isArray(tourData) ? tourData : []);
       } catch (err) {
@@ -66,9 +86,9 @@ export default function BookingForm() {
     fetchData();
   }, []);
 
-  // Auto select from URL params
+  // Auto-select from URL only if prefilled
   useEffect(() => {
-    if (!typeFromUrl || !slugFromUrl) return;
+    if (!isPrefilled || !typeFromUrl || !slugFromUrl) return;
     if (!packages.length && !tours.length) return;
 
     const list = typeFromUrl === "package" ? packages : tours;
@@ -78,43 +98,32 @@ export default function BookingForm() {
       setBookingType(typeFromUrl);
       setSelectedItem(match.title || match.name || "");
     }
-  }, [packages, tours, typeFromUrl, slugFromUrl]);
+  }, [packages, tours, isPrefilled, typeFromUrl, slugFromUrl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError(null);
+    setErrors({});
     setSuccess(false);
-
-    const formData = new FormData(e.currentTarget);
-
-    const fullName = (formData.get("fullName") || "").toString().trim();
-    const email = (formData.get("email") || "").toString().trim();
-    const phone = (formData.get("phone") || "").toString().trim();
-
-    // Validation
-    if (!fullName) return setFormError("Full name is required");
-    if (!email) return setFormError("Email address is required");
-    if (!phone) return setFormError("Phone number is required");
-    if (!bookingType) return setFormError("Please select booking type");
-    if (!selectedItem) return setFormError("Please select a package or tour");
-
-    // Basic email validation
-    if (!email.includes("@") || !email.includes(".")) {
-      return setFormError("Please enter a valid email address");
-    }
-
-    setLoading(true);
 
     const payload = {
       bookingType,
       itemTitle: selectedItem,
-      fullName,
-      email,
-      phone,
-      travelDate: formData.get("travelDate") || null,
-      travelers: Number(formData.get("travelers") || 1),
-      message: formData.get("message") || null,
+      ...formData,
+      travelers: Number(formData.travelers) || 1,
     };
+
+    const result = bookingSchema.safeParse(payload);
+
+    if (!result.success) {
+      const fieldErrors = {};
+      result.error.issues.forEach((issue) => {
+        fieldErrors[issue.path[0]] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/bookings", {
@@ -134,115 +143,153 @@ export default function BookingForm() {
         setBookingType("");
         setSelectedItem("");
       }
+
+      setFormData({
+        fullName: "",
+        email: "",
+        phone: "",
+        travelDate: "",
+        travelers: "2",
+        message: "",
+      });
+      setErrors({});
+
     } catch (err) {
-      setFormError(err.message || "Something went wrong. Please try again.");
+      setErrors({ submit: err.message || "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }
   };
 
+  const updateField = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[var(--color-surface)] to-[var(--color-bg)]">
       <div className="max-w-3xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
           ref={formRef}
-          
-          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
+          className="bg-[var(--color-bg)] rounded-2xl shadow-xl overflow-hidden border border-[var(--color-border)]"
         >
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-white text-center">
+          {/* Header - Gradient remains strong in both themes */}
+          <div className="bg-gradient-to-r from-primary-600 to-primary-500 px-8 py-10 text-white text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
               Book Your Dubai Experience
             </h2>
-            <p className="text-blue-100 opacity-90 max-w-lg mx-auto">
+            <p className="opacity-90 max-w-lg mx-auto text-white/90">
               Tell us your dream trip — we'll make it happen!
             </p>
           </div>
 
           <div className="p-8 md:p-10">
-          
-        
-            <form  onSubmit={handleSubmit}  
-               noValidate
-            className="space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6">
               {/* Name + Email */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                     Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     name="fullName"
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    value={formData.fullName}
+                    onChange={(e) => updateField("fullName", e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border ${
+                      errors.fullName ? "border-red-500" : "border-[var(--color-border)]"
+                    } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition`}
                     placeholder="John Doe"
                   />
+                  {errors.fullName && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     name="email"
                     type="email"
-                    required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    value={formData.email}
+                    onChange={(e) => updateField("email", e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border ${
+                      errors.email ? "border-red-500" : "border-[var(--color-border)]"
+                    } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition`}
                     placeholder="john@example.com"
                   />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                  )}
                 </div>
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                   Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="phone"
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  value={formData.phone}
+                  onChange={(e) => updateField("phone", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-lg border ${
+                    errors.phone ? "border-red-500" : "border-[var(--color-border)]"
+                  } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition`}
                   placeholder="+971 50 123 4567"
                 />
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
+                )}
               </div>
 
               {/* Booking Type */}
               {!isPrefilled && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                     Booking Type <span className="text-red-500">*</span>
                   </label>
                   <select
-                    required
                     value={bookingType}
                     onChange={(e) => {
                       setBookingType(e.target.value);
                       setSelectedItem("");
+                      setErrors((prev) => ({ ...prev, bookingType: undefined, itemTitle: undefined }));
                     }}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    className={`w-full px-4 py-3 rounded-lg border ${
+                      errors.bookingType ? "border-red-500" : "border-[var(--color-border)]"
+                    } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition`}
                   >
                     <option value="">Select Booking Type</option>
                     <option value="package">Package</option>
                     <option value="tour">Tour / Activity</option>
                   </select>
+                  {errors.bookingType && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.bookingType}</p>
+                  )}
                 </div>
               )}
 
               {/* Selected Item */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                   {bookingType === "tour" ? "Tour / Activity" : "Package"}{" "}
                   <span className="text-red-500">*</span>
                 </label>
                 <select
-                  required
                   disabled={!bookingType || isPrefilled}
                   value={selectedItem}
-                  onChange={(e) => setSelectedItem(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  onChange={(e) => {
+                    setSelectedItem(e.target.value);
+                    setErrors((prev) => ({ ...prev, itemTitle: undefined }));
+                  }}
+                  className={`w-full px-4 py-3 rounded-lg border ${
+                    errors.itemTitle ? "border-red-500" : "border-[var(--color-border)]"
+                  } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition disabled:opacity-60`}
                 >
                   <option value="">
-                    Select {bookingType ? bookingType : "item"}
+                    Select {bookingType || "item"}
                   </option>
                   {(bookingType === "tour" ? tours : packages).map((item) => (
                     <option key={item.id} value={item.title || item.name}>
@@ -250,59 +297,77 @@ export default function BookingForm() {
                     </option>
                   ))}
                 </select>
+                {errors.itemTitle && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.itemTitle}</p>
+                )}
               </div>
 
               {/* Date + Travelers */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                     Preferred Travel Date
                   </label>
                   <input
                     name="travelDate"
                     type="date"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    value={formData.travelDate}
+                    onChange={(e) => updateField("travelDate", e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                     Number of Travelers
                   </label>
                   <input
                     name="travelers"
                     type="number"
                     min="1"
-                    defaultValue="2"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    value={formData.travelers}
+                    onChange={(e) => updateField("travelers", e.target.value)}
+                    className={`w-full px-4 py-3 rounded-lg border ${
+                      errors.travelers ? "border-red-500" : "border-[var(--color-border)]"
+                    } bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition`}
                   />
+                  {errors.travelers && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.travelers}</p>
+                  )}
                 </div>
               </div>
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
                   Additional Requests / Notes
                 </label>
                 <textarea
                   name="message"
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
+                  value={formData.message}
+                  onChange={(e) => updateField("message", e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition resize-none"
                   placeholder="Any special requirements, preferences or questions..."
                 />
               </div>
-              {formError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-5 mb-8 text-center font-bold">
-                {formError}
-              </div>
-            )}
+
+              {/* General submit error */}
+              {errors.submit && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl p-5 text-center font-bold">
+                  {errors.submit}
+                </div>
+              )}
 
               {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
                 className={`w-full py-4 rounded-xl font-semibold text-white transition-all duration-300
-                  ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg"}`}
+                  ${loading 
+                    ? "bg-gray-500 dark:bg-gray-600 cursor-not-allowed" 
+                    : "bg-primary-500 hover:bg-primary-600 shadow-md hover:shadow-lg"
+                  }`}
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -314,19 +379,19 @@ export default function BookingForm() {
                 )}
               </button>
 
-                {success && (
-              <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-6 mb-8 text-center font-medium">
-                <div className="text-2xl mb-2">🎉 Thank you!</div>
-                <p>
-                  Your booking request has been sent successfully.
-                  <br />
-                  Our team will contact you within 24 hours.
-                </p>
-              </div>
-            )}
+              {/* Success Message */}
+              {success && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 rounded-xl p-6 text-center font-medium">
+                  <div className="text-2xl mb-2">🎉 Thank you!</div>
+                  <p>
+                    Your booking request has been sent successfully.
+                    <br />
+                    Our team will contact you within 24 hours.
+                  </p>
+                </div>
+              )}
 
-
-              <p className="text-center text-sm text-gray-500 mt-4">
+              <p className="text-center text-sm text-[var(--color-text-secondary)] mt-4">
                 No payment required • We'll contact you within 24 hours
               </p>
             </form>
