@@ -11,7 +11,6 @@ export async function GET() {
         t.short_description,
         t.description,
         t.price,
-        t.duration_days,
         t.image,
         t.status,
         c.slug AS category_slug

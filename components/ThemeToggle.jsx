@@ -27,15 +27,31 @@ export default function ThemeToggle() {
     setTheme(initial);
   }, []);
 
+  // Listen for system theme changes
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = (e) => {
+      if (theme === 'system') {
+        document.documentElement.classList.toggle('dark', e.matches);
+        setIsDark(e.matches);
+      }
+    };
+
+    media.addEventListener('change', handleChange);
+
+    return () => media.removeEventListener('change', handleChange);
+  }, [theme]);
+
   const toggleTheme = () => {
     let nextTheme;
 
-    if (theme === 'light') {
+    if (theme === 'system') {
+      nextTheme = isDark ? 'light' : 'dark';
+    } else if (theme === 'light') {
       nextTheme = 'dark';
     } else if (theme === 'dark') {
       nextTheme = 'system';
-    } else {
-      nextTheme = 'light';
     }
 
     setTheme(nextTheme);

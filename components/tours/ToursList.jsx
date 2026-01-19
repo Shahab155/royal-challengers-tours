@@ -1,45 +1,7 @@
 'use client';
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import RippleButton from "@/components/RippleButton";
-
-/* ------------------ Motion Variants ------------------ */
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.18,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 60 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.18,
-      duration: 0.8,
-      ease: [0.215, 0.61, 0.355, 1],
-    },
-  }),
-};
-
-const loaderVariants = {
-  animate: {
-    rotate: 360,
-    transition: {
-      duration: 1.5,
-      repeat: Infinity,
-      ease: "linear",
-    },
-  },
-};
-
-/* ------------------ Component ------------------ */
 
 export default function ToursList({ filteredTours, isLoading = false }) {
   return (
@@ -51,12 +13,8 @@ export default function ToursList({ filteredTours, isLoading = false }) {
         {/* ================= LOADER ================= */}
         {isLoading && (
           <div className="text-center py-24 flex flex-col items-center justify-center">
-            <motion.div
-              className="w-20 h-20 border-8 border-t-primary-500 border-l-primary-500 border-b-transparent border-r-transparent rounded-full shadow-lg"
-              variants={loaderVariants}
-              animate="animate"
-            />
-            <p className="mt-6 text-lg font-medium text-text-secondary animate-pulse">
+            <div className="w-20 h-20 border-8 border-t-primary-500 border-l-primary-500 border-b-transparent border-r-transparent rounded-full shadow-lg" />
+            <p className="mt-6 text-lg font-medium text-text-secondary">
               Loading exclusive tours...
             </p>
           </div>
@@ -74,20 +32,9 @@ export default function ToursList({ filteredTours, isLoading = false }) {
 
         {/* ================= TOURS GRID ================= */}
         {!isLoading && filteredTours.length > 0 && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
-          >
-            {filteredTours.map((tour, index) => (
-              <motion.div
-                key={tour.slug}
-                custom={index}
-                variants={cardVariants}
-                className="group"
-              >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {filteredTours.map((tour) => (
+              <div key={tour.slug} className="group">
                 <div
                   className={`
                     glass-card-strong flex flex-col h-full
@@ -125,7 +72,7 @@ export default function ToursList({ filteredTours, isLoading = false }) {
                       )}
                     </div>
 
-                    {/* Price Tag */}
+                    {/* Price Tag - fixed text */}
                     <div className="absolute top-5 right-5 z-20">
                       <div className="bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10">
                         <span className="text-white font-bold text-xl tracking-tight">
@@ -143,31 +90,28 @@ export default function ToursList({ filteredTours, isLoading = false }) {
                       </Link>
                     </h3>
 
-                    <p className="text-text-secondary mb-8 text-[15px] leading-relaxed flex-grow">
+                    <p className="text-text-secondary line-clamp-2 mb-8 text-[15px] leading-relaxed flex-grow">
                       {tour.description}
                     </p>
 
-                    {/* Footer - Duration + Price + Full-Width RippleButton */}
+                    {/* Footer */}
                     <div className="mt-auto pt-6 border-t border-white/10 space-y-6">
                       <div className="flex items-center justify-between">
                         <div className="text-text-secondary text-sm font-medium">
-                          <span className="text-sm md:text-md font-extrabold">Duration:</span> {tour.duration}
+                          <span className="text-sm md:text-md font-extrabold">Price:</span> {tour.price}
                         </div>
-                        
-                      {/* Full-Width RippleButton */}
-                      <RippleButton
-                        text="View Details"
-                        href={`/tours/${tour.slug}`}
-                       
-                      />
-                      </div>
 
+                        <RippleButton
+                          text="View Details"
+                          href={`/tours/${tour.slug}`}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

@@ -1,9 +1,12 @@
-// app/booking/page.jsx
+// app/(site)/booking/[slug]/page.js
 import BookingHero from '@/components/booking/BookingHero';
-import BookingForm from '@/components/booking/BookingForm';
+import TourBookingForm from '@/components/booking/TourBookingForm';
 import { Suspense } from 'react';
 
-export default function BookingPage() {
+export default async function TourBookingPage({ params, searchParams }) {
+  const { slug } = await params;
+  const { date, slot, adults, children } = await searchParams;
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       <BookingHero />
@@ -13,9 +16,11 @@ export default function BookingPage() {
           <p className="text-gray-600">Loading booking form...</p>
         </div>
       }>
-        <BookingForm />
+        <TourBookingForm 
+          tourSlug={slug} 
+          bookingDetails={{ date, slot, adults: parseInt(adults) || 1, children: parseInt(children) || 0 }} 
+        />
       </Suspense>
-    
     </main>
   );
 }

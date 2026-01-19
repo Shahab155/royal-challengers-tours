@@ -19,12 +19,7 @@ const tourSchema = z.object({
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Price must be a positive number",
     }),
-  duration_days: z
-    .string()
-    .min(1, "Duration is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 1, {
-      message: "Duration must be at least 1 day",
-    }),
+
   status: z.enum(["active", "inactive"]),
   image: z
     .instanceof(FileList)
@@ -251,26 +246,7 @@ export default function AddTourPage() {
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                    Duration (Days) <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    {...register("duration_days")}
-                    placeholder="e.g. 7"
-                    className={`w-full px-5 py-4 text-lg rounded-2xl border ${
-                      errors.duration_days
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        : "border-gray-300 dark:border-gray-600 focus:border-amber-500 focus:ring-amber-500/20"
-                    } bg-white/70 dark:bg-gray-900/50 text-gray-900 dark:text-white outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500`}
-                  />
-                  {errors.duration_days && (
-                    <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.duration_days.message}</p>
-                  )}
-                </div>
-
+            
                 <div className="space-y-3">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                     Initial Status

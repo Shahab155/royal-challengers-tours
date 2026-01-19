@@ -1,4 +1,3 @@
-// app/admin/categories/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -44,7 +43,6 @@ export default function CategoriesPage() {
         throw new Error("Failed to delete category. It may be in use.");
       }
 
-      // Optimistic update
       setCategories((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       alert(err.message || "Failed to delete category");
@@ -54,6 +52,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-950 p-6 md:p-8 lg:p-10">
       <div className="max-w-full mx-auto space-y-10">
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div>
@@ -116,9 +115,10 @@ export default function CategoriesPage() {
         ) : (
           <div className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-sm">
-                <thead className="bg-gradient-to-r from-indigo-50/80 to-purple-50/80 dark:from-indigo-950/40 dark:to-purple-950/40 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-10">
+              <table className="w-full min-w-[900px] text-sm">
+                <thead className="bg-gradient-to-r from-indigo-50/80 to-purple-50/80 dark:from-indigo-950/40 dark:to-purple-950/40 border-b border-gray-200/50 dark:border-gray-700/50">
                   <tr className="text-gray-700 dark:text-gray-300 font-semibold text-left">
+                    <th className="px-6 py-5">Image</th>
                     <th className="px-6 py-5">Name</th>
                     <th className="px-6 py-5">Type</th>
                     <th className="px-6 py-5 text-center">Status</th>
@@ -130,8 +130,23 @@ export default function CategoriesPage() {
                   {categories.map((cat) => (
                     <tr
                       key={cat.id}
-                      className="group hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition-colors duration-200"
+                      className="group hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition-colors"
                     >
+                      {/* Image */}
+                      <td className="px-6 py-5">
+                        {cat.image ? (
+                          <img
+                            src={`/images/categories/${cat.image}`}
+                            alt={cat.name}
+                            className="h-12 w-12 rounded-lg object-cover shadow-md ring-1 ring-gray-200 dark:ring-gray-700"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs text-gray-500">
+                            —
+                          </div>
+                        )}
+                      </td>
+
                       <td className="px-6 py-5 font-medium text-gray-900 dark:text-white truncate max-w-xs">
                         {cat.name}
                       </td>
@@ -144,8 +159,8 @@ export default function CategoriesPage() {
                         <span
                           className={`inline-flex px-4 py-1.5 text-xs font-semibold rounded-full ${
                             cat.status === "active"
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700/50"
-                              : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700/50"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
+                              : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
                           }`}
                         >
                           {cat.status || "active"}

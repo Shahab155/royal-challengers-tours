@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MdArrowBack, MdAdd } from "react-icons/md";
+import { MdArrowBack, MdAdd, MdUpload } from "react-icons/md";
 
 export default function CreateCategoryPage() {
   const router = useRouter();
@@ -11,18 +11,34 @@ export default function CreateCategoryPage() {
   const [name, setName] = useState("");
   const [type, setType] = useState("both");
   const [status, setStatus] = useState("active");
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleImageChange = (file) => {
+    setImage(file);
+
+    if (!file) {
+      setImagePreview(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Basic client-side validation
     if (!name.trim()) {
       setError("Category name is required");
       return;
     }
+
     if (name.trim().length < 3) {
       setError("Category name must be at least 3 characters");
       return;
@@ -31,10 +47,18 @@ export default function CreateCategoryPage() {
     setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      formData.append("type", type);
+      formData.append("status", status);
+
+      if (image) {
+        formData.append("image", image);
+      }
+
       const res = await fetch("/api/admin/categories", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), type, status }),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -63,56 +87,84 @@ export default function CreateCategoryPage() {
               <MdArrowBack size={20} />
               Back to Categories
             </button>
+
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Create New Category
             </h1>
+
             <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
               Organize your tours and packages with a new category
             </p>
           </div>
         </div>
 
-        {/* Error Message */}
+        {/* Error */}
         {error && (
           <div className="bg-red-50/80 dark:bg-red-900/30 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm">
             {error}
           </div>
         )}
 
-        {/* Form Card */}
+        {/* Form */}
         <form
           onSubmit={handleSubmit}
           className="bg-white/80 dark:bg-gray-800/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden"
         >
           <div className="p-8 lg:p-12 space-y-10">
+
             {/* Category Name */}
             <div className="space-y-3">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                 Category Name <span className="text-rose-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Adventure Tours"
-                  required
-                  minLength={3}
-                  className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Adventure Tours"
+                className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              />
+            </div>
+
+            {/* Service Image */}
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                Service Image
+              </label>
+
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Service Preview"
+                  className="h-48 w-full object-cover rounded-2xl border"
                 />
-                {name.trim().length > 0 && name.trim().length < 3 && (
-                  <p className="mt-1.5 text-sm text-rose-500">
-                    Name must be at least 3 characters
-                  </p>
-                )}
-              </div>
+              )}
+
+              <label className="flex items-center gap-3 cursor-pointer text-indigo-600 dark:text-indigo-400 font-medium">
+                <MdUpload size={22} />
+                Upload image
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) =>
+                    handleImageChange(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+
+              <p className="text-xs text-gray-500">
+                JPG, PNG or WebP • Recommended size 800×600
+              </p>
             </div>
 
             {/* Applies To */}
             <div className="space-y-3">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                Applies To <span className="text-rose-500">*</span>
+                Applies To
               </label>
+
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
@@ -129,6 +181,7 @@ export default function CreateCategoryPage() {
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                 Initial Status
               </label>
+
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
@@ -140,16 +193,7 @@ export default function CreateCategoryPage() {
             </div>
 
             {/* Actions */}
-            <div className="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-end gap-4">
-              <button
-                type="button"
-                onClick={() => router.push("/admin/categories")}
-                disabled={loading}
-                className="px-10 py-4 rounded-2xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all disabled:opacity-50"
-              >
-                Cancel
-              </button>
-
+            <div className="pt-8 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-4">
               <button
                 type="submit"
                 disabled={loading}
@@ -172,6 +216,7 @@ export default function CreateCategoryPage() {
                 )}
               </button>
             </div>
+
           </div>
         </form>
       </div>

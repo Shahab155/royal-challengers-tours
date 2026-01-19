@@ -35,7 +35,6 @@ export async function PUT(request, context) {
   const short_description = formData.get("short_description");
   const description = formData.get("description");
   const price = formData.get("price");
-  const duration_days = formData.get("duration_days");
   const category_id = formData.get("category_id");
   const status = formData.get("status");
   const image = formData.get("image");
@@ -49,7 +48,6 @@ export async function PUT(request, context) {
     short_description,
     description,
     price,
-    duration_days,
     category_id,
     status,
   ];
@@ -76,7 +74,6 @@ export async function PUT(request, context) {
       short_description = ?,
       description = ?,
       price = ?,
-      duration_days = ?,
       category_id = ?,
       status = ?
       ${imageSql}

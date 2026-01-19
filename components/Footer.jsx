@@ -5,7 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaFacebookF, FaInstagram, FaTwitter, FaWhatsapp } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaTiktok } from 'react-icons/fa';
 
 export default function Footer() {
   const footerRef = useRef(null);
@@ -88,14 +88,14 @@ export default function Footer() {
             {/* Social Icons */}
             <div className="flex items-center gap-4">
               {[
-                { Icon: FaFacebookF, href: '#' },
-                { Icon: FaInstagram, href: '#' },
-                { Icon: FaTwitter, href: '#' },
-                { Icon: FaWhatsapp, href: '#' },
+                { Icon: FaFacebookF, href: ' https://www.facebook.com/royalchallengerstours0' },
+                { Icon: FaInstagram, href: ' https://www.instagram.com/rctours1/' },
+                { Icon: FaTiktok, href: 'https://www.tiktok.com/@rctours1' },
               ].map(({ Icon, href }, i) => (
                 <Link
                   key={i}
                   href={href}
+                  target='_blank'
                   className="
                     h-11 w-11 rounded-full
                     flex items-center justify-center
@@ -152,12 +152,11 @@ export default function Footer() {
             </h3>
             <ul className="space-y-5 text-[var(--color-text-secondary)]">
               <li>
-                Office 305, Downtown Dubai<br />
-                Sheikh Mohammed Bin Rashid Blvd
+                Shop No:18 Al Fahidi Plaza Bur Dubai, UAE
               </li>
               <li>
                 <a href="tel:+971501234567" className="hover:text-accent-500 transition">
-                  +971 50 123 4567
+                  +971 50 337 0345
                 </a>
               </li>
               <li>

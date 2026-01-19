@@ -30,7 +30,7 @@ export default function CTASection() {
           {/* CTA Buttons */}
           <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link
-              href="/packages"
+              href="/tours"
               className="
                 btn-outline
                 rounded-full
@@ -39,11 +39,11 @@ export default function CTASection() {
                 backdrop-blur-md
               "
             >
-              Explore Packages
+              Explore Tours
             </Link>
 
             <Link
-              href="/booking"
+              href="/contact"
               className="
                 inline-flex items-center justify-center
                 rounded-full px-10 py-4

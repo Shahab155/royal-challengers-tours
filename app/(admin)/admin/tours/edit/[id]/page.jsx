@@ -29,15 +29,7 @@ const editTourSchema = z.object({
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
       message: "Price must be a positive number",
     }),
-  duration_days: z
-    .string()
-    .min(1, "Duration is required")
-    .refine((val) => {
-      const num = Number(val);
-      return !isNaN(num) && num >= 1 && Number.isInteger(num);
-    }, {
-      message: "Duration must be a positive whole number",
-    }),
+ 
   status: z.enum(["active", "inactive"]),
   image: z
     .instanceof(FileList)
@@ -223,7 +215,7 @@ export default function EditTourPage() {
                   type="text"
                   {...register("title")}
                   placeholder="e.g. Northern Lights Adventure"
-                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
                     errors.title
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       : "border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500/20"
@@ -238,7 +230,7 @@ export default function EditTourPage() {
                 </label>
                 <select
                   {...register("category_id")}
-                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-white ${
+                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-gray-900 ${
                     errors.category_id
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       : "border-gray-300 dark:border-gray-600 focus:border-purple-500 focus:ring-purple-500/20"
@@ -268,7 +260,7 @@ export default function EditTourPage() {
                   {...register("short_description")}
                   rows={4}
                   placeholder="Brief overview shown in listings (max 30 words)"
-                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
                     errors.short_description || isShortDescOverLimit
                       ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       : "border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500/20"
@@ -289,7 +281,7 @@ export default function EditTourPage() {
                   {...register("description")}
                   rows={8}
                   placeholder="Detailed itinerary, inclusions, highlights..."
-                  className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 outline-none transition-all resize-y"
+                  className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 outline-none transition-all resize-y"
                 />
               </div>
             </div>
@@ -308,7 +300,7 @@ export default function EditTourPage() {
                     min="0.01"
                     {...register("price")}
                     placeholder="2999.00"
-                    className={`w-full pl-12 pr-5 py-4 text-lg rounded-2xl border text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                    className={`w-full pl-12 pr-5 py-4 text-lg rounded-2xl border text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
                       errors.price
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         : "border-gray-300 dark:border-gray-600 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -320,30 +312,11 @@ export default function EditTourPage() {
 
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                  Duration (Days) <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  {...register("duration_days")}
-                  placeholder="e.g. 7"
-                  className={`w-full px-5 py-4 text-lg rounded-2xl border text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
-                    errors.duration_days
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                      : "border-gray-300 dark:border-gray-600 focus:border-amber-500 focus:ring-amber-500/20"
-                  } bg-white/70 dark:bg-gray-900/50 outline-none transition-all`}
-                />
-                {errors.duration_days && <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{errors.duration_days.message}</p>}
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                   Status
                 </label>
                 <select
                   {...register("status")}
-                  className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 outline-none transition-all appearance-none"
+                  className="w-full px-5 py-4 text-lg rounded-2xl border border-gray-300 dark:border-gray-600 bg-white/70 dark:bg-gray-900/50 text-gray-900 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 outline-none transition-all appearance-none"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive (Draft)</option>
@@ -366,7 +339,7 @@ export default function EditTourPage() {
                         <button
                           type="button"
                           onClick={removeNewImage}
-                          className="absolute top-4 right-4 p-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur rounded-full shadow-lg hover:scale-110 transition-all text-gray-800 dark:text-white"
+                          className="absolute top-4 right-4 p-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur rounded-full shadow-lg hover:scale-110 transition-all text-gray-800 dark:text-gray-900"
                         >
                           ✕
                         </button>
@@ -411,7 +384,7 @@ export default function EditTourPage() {
               >
                 {submitLoading ? (
                   <>
-                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2  border-white/30 border-t-white rounded-full animate-spin" />
                     Updating Tour...
                   </>
                 ) : (

@@ -1,27 +1,24 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
-// Inline FilterPill component (no separate file needed)
 function FilterPill({ active, label, onClick }) {
   return (
-    <motion.button
+    <button
       onClick={onClick}
-      whileTap={{ scale: 0.95 }}
       className={`
         px-6 py-3 rounded-full
         text-sm md:text-base font-medium
-        transition-all duration-300
+        transition-all duration-200
         border
         ${active
-          ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white border-transparent shadow-md shadow-primary-500/25'
-          : 'bg-white/80 dark:bg-transparent text-[var(--color-text)] border-[var(--color-border)] hover:bg-white dark:hover:bg-white/10'
+          ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white border-transparent shadow-md shadow-primary-500/30'
+          : 'bg-[--color-surface]/70 text-[--color-text] border-[--color-border] hover:bg-[--color-surface]/90 active:bg-[--color-surface]/80'
         }
       `}
     >
       {label}
-    </motion.button>
+    </button>
   );
 }
 
@@ -32,8 +29,6 @@ export default function ToursFilters({
   setActiveCategory,
 }) {
   const [categories, setCategories] = useState([]);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   useEffect(() => {
     fetch('/api/categories/tours')
@@ -42,48 +37,73 @@ export default function ToursFilters({
         setCategories(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
-        console.error('Failed to load tour categories', err);
+        console.error('Failed to load tour categories:', err);
       });
   }, []);
 
   return (
     <div className="py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="glass-card rounded-3xl px-6 py-6 md:px-10 md:py-8 border border-[var(--color-border)]"
-        >
+        <div className="
+          glass-card 
+          rounded-3xl 
+          px-6 py-6 md:px-10 md:py-8 
+          border border-[--color-border]
+        ">
           <div className="flex flex-col md:flex-row gap-6 lg:gap-10 items-center justify-between">
 
             {/* Search Input */}
-            <div className="w-full md:w-96 lg:w-[420px]">
-              <input
-                type="text"
-                placeholder="Search tours (Burj Khalifa, yacht, desert...)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="
-                  w-full px-6 py-4 rounded-2xl
-                  bg-white/70 dark:bg-black/30
-                  border border-[var(--color-border)]
-                  text-[var(--color-text)]
-                  placeholder:text-[var(--color-text-secondary)]
-                  outline-none transition-all
-                  focus:border-primary-500
-                  focus:ring-2 focus:ring-primary-500/20
-                "
-              />
-            </div>
+           <div className="w-full md:w-96 lg:w-[420px] relative group">
+             <input
+    type="text"
+    id="tour-search"
+    placeholder=" "
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className="
+      peer
+      w-full px-5 py-4 rounded-xl
 
-            {/* Filter Pills */}
+      bg-[var(--color-surface)]
+      border border-[var(--color-border)]
+      text-[var(--color-text)]
+      placeholder-transparent
+
+      outline-none
+      transition-all duration-300
+
+      focus:border-primary-500
+      focus:ring-2 focus:ring-primary-500/30
+    "
+  />
+
+  <label
+    htmlFor="tour-search"
+    className="
+      absolute left-5 top-1/2 -translate-y-1/2
+      text-sm text-[var(--color-text-secondary)]
+
+      transition-all duration-300
+      pointer-events-none
+
+      peer-focus:top-2
+      peer-focus:text-xs
+      peer-focus:text-primary-500
+
+      peer-not-placeholder-shown:top-2
+      peer-not-placeholder-shown:text-xs
+    "
+  >
+    Search tours (Burj Khalifa, yacht, desert…)
+  </label>
+  </div>
+
+            {/* Filter Pills Container */}
             <div className="
               flex flex-wrap justify-center gap-3 md:gap-4
-              px-4 py-3 rounded-2xl
-              border border-[var(--color-border)]
-              bg-white/60 dark:bg-black/20
+              px-5 py-4 rounded-2xl
+              border border-[--color-border]
+              bg-[--color-surface]/60
               backdrop-blur-md
             ">
               <FilterPill
@@ -101,8 +121,9 @@ export default function ToursFilters({
                 />
               ))}
             </div>
+
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

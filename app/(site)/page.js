@@ -1,14 +1,14 @@
 import AboutSection from "@/components/AboutSection";
 import CTASection from "@/components/CallToAction";
-import HeroSection from "@/components/CallToAction";
 import ContactSection from "@/components/ContactForm";
 import FAQSection from "@/components/FAQSection";
-import FeaturedPackages from "@/components/FeaturedPakages";
+import FeaturedTours from "@/components/FeaturedTours";
 import Gallery from "@/components/Gallery";
 import Hero from "@/components/Hero";
+import OurServicesSection from "@/components/OurServicesSection";
 import Testimonials from "@/components/Testimonials";
 import WhyChooseUs from "@/components/WhyChoose";
-import bcrypt from 'bcryptjs';
+
 
 export default function Home() {
    
@@ -17,9 +17,9 @@ export default function Home() {
    <>
   
    <Hero />
-   <AboutSection/>
-   
-   <FeaturedPackages />
+   {/* <AboutSection/> */}
+   <OurServicesSection/>
+   <FeaturedTours />
    <Gallery/>
    
    <WhyChooseUs

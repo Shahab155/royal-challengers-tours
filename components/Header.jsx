@@ -13,7 +13,6 @@ import {
   FaPhoneAlt,
   FaBars,
   FaTimes,
-  FaCalendarCheck,
 } from "react-icons/fa";
 
 export default function Navbar() {
@@ -29,9 +28,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = ["Home", "Packages", "Tours", "About", "Contact"];
-
-  const getHref = (item) => (item === "Home" ? "/" : `/${item.toLowerCase().replace(" ", "-")}`);
+  const navItems = [
+    { name: "Home", href: "/" },
+    { name: "Tours", href: "/tours" },
+    { name: "Packages", href: "/packages" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   const isActive = (path) => pathname === path;
 
@@ -55,9 +58,9 @@ export default function Navbar() {
         `}
         aria-label="Main navigation"
       >
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex items-center justify-between h-20 lg:justify-start">
-            {/* Desktop Logo - Left Aligned */}
+        <div className="mx-auto px-6 lg:px-12 max-w-7xl">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo - Left */}
             <Link href="/" className="flex-shrink-0 relative">
               <div className="relative h-32 w-auto">
                 <Image
@@ -83,40 +86,26 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="flex items-center space-x-10 ml-auto">
+            {/* Centered Navigation */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-12">
               {navItems.map((item) => (
-                <motion.div key={item} whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
+                <motion.div key={item.name} whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
                   <Link
-                    href={getHref(item)}
+                    href={item.href}
                     className={`relative font-extrabold text-lg transition-colors
                       text-gray-900 dark:text-white
                       hover:text-primary-500
-                      ${isActive(getHref(item)) ? "after:absolute after:bottom-[-10px] after:left-0 after:w-full after:h-1.5 after:bg-accent-500 after:rounded-full" : ""}
+                      ${isActive(item.href) ? "after:absolute after:bottom-[-10px] after:left-0 after:w-full after:h-1.5 after:bg-accent-500 after:rounded-full" : ""}
                     `}
                   >
-                    {item}
+                    {item.name}
                   </Link>
                 </motion.div>
               ))}
+            </div>
 
-              {/* Clean Book Now Button - No Ripple */}
-              <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href="/booking"
-                  className="relative overflow-hidden inline-flex items-center justify-center
-                    bg-gradient-to-r from-primary-500 to-accent-500 
-                    text-white font-bold px-8 py-4 rounded-full 
-                    shadow-lg hover:shadow-2xl transition-all duration-500
-                    group"
-                >
-                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
-                  </span>
-                  <span className="relative z-10">Book Now</span>
-                </Link>
-              </motion.div>
-
+            {/* Theme Toggle - Right */}
+            <div className="flex items-center">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <ThemeToggle />
               </motion.div>
@@ -125,91 +114,105 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* ==================== MOBILE NAVBAR ==================== */}
-      <div className="fixed top-0 left-0 right-0 z-50 lg:hidden">
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className={`px-4 py-3 transition-all duration-500 ${
-            scrolled  
-              ? "bg-white/95 dark:bg-gray-900/95 shadow-lg"
-              : "bg-transparent backdrop-blur-md"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <ThemeToggle />
-              </motion.div>
-            </div>
-
-            <Link href="/" className="flex-shrink-0 relative">
-              <div className="relative h-24 md:h-28 w-auto">
-                <Image
-                  src="/images/logo-light.png"
-                  alt="Royal Travelers"
-                  width={200}
-                  height={110}
-                  className={`h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
-                    ${scrolled || !isDark ? "opacity-100" : "opacity-0"}
-                  `}
-                  priority
-                />
-                <Image
-                  src="/images/logo-dark.png"
-                  alt="Royal Travelers"
-                  width={200}
-                  height={110}
-                  className={`absolute inset-0 h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
-                    ${!scrolled && isDark ? "opacity-100" : "opacity-0"}
-                  `}
-                  priority
-                />
-              </div>
-            </Link>
-
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="p-2 rounded-lg text-gray-900 dark:text-white hover:bg-white/20 dark:hover:bg-black/20 transition"
-            >
-              <FaBars size={24} />
-            </button>
-          </div>
-        </motion.div>
+    
+      {/* ==================== MOBILE TOP BAR – ONLY LOGO ==================== */}
+<div className="fixed top-0 left-0 right-0 z-50 lg:hidden">
+  <motion.div
+    initial={{ y: -20, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    className={`px-4 py-3 transition-all duration-500 flex justify-center items-center
+      ${scrolled  
+        ? "bg-white/95 dark:bg-gray-900/95 shadow-lg"
+        : "bg-transparent backdrop-blur-md"
+      }`}
+  >
+    <Link href="/" className="flex-shrink-0 relative">
+      <div className="relative h-20 w-auto"> {/* slightly smaller than before for better balance */}
+        <Image
+          src="/images/logo-light.png"
+          alt="Royal Travelers"
+          width={180}
+          height={100}
+          className={`h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
+            ${scrolled || !isDark ? "opacity-100" : "opacity-0"}
+          `}
+          priority
+        />
+        <Image
+          src="/images/logo-dark.png"
+          alt="Royal Travelers"
+          width={180}
+          height={100}
+          className={`absolute inset-0 h-full w-auto object-contain transition-opacity duration-500 drop-shadow-md
+            ${!scrolled && isDark ? "opacity-100" : "opacity-0"}
+          `}
+          priority
+        />
       </div>
+    </Link>
+  </motion.div>
+</div>
 
-      {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe-area-inset-bottom">
-        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl border-t border-white/20 dark:border-black/20">
-          <div className="flex items-end justify-between px-3 py-1">
-            <Link href="/contact" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/contact") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
-              <FaPhoneAlt className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-medium leading-none">Contact</span>
-            </Link>
+{/* ==================== MOBILE BOTTOM NAV – 5 ITEMS ==================== */}
+<div className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe-area-inset-bottom">
+  <div className="bg-white/92 dark:bg-gray-900/92 backdrop-blur-xl shadow-2xl border-t border-white/20 dark:border-black/20">
+    <div className="flex items-center justify-between px-3 py-2">
+      
+      {/* Contact */}
+      <Link 
+        href="/contact" 
+        className={`flex flex-col items-center gap-1 flex-1 transition-colors
+          ${isActive("/contact") ? "text-accent-500" : "text-gray-600 dark:text-gray-500"}`}
+      >
+        <FaPhoneAlt className="w-6 h-6" />
+        <span className="text-[10px] font-medium">Contact</span>
+      </Link>
 
-            <Link href="/packages" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/packages") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
-              <FaSuitcaseRolling className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-medium leading-none">Packages</span>
-            </Link>
+      {/* About */}
+      <Link 
+        href="/about" 
+        className={`flex flex-col items-center gap-1 flex-1 transition-colors
+          ${isActive("/about") ? "text-accent-500" : "text-gray-600 dark:text-gray-500"}`}
+      >
+        <FaSuitcaseRolling className="w-6 h-6" /> {/* you can change icon if you want */}
+        <span className="text-[10px] font-medium">About</span>
+      </Link>
 
-            <Link href="/" className={`flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl transition-all duration-200 ${isActive("/") ? "bg-accent-500 text-white" : "bg-primary-500 text-white"}`}>
-              <FaHome className="w-7 h-7 sm:w-8 sm:h-8" />
-            </Link>
+      {/* Home - Big Round Button */}
+      <Link 
+        href="/" 
+        className={`flex flex-col items-center justify-center w-16 h-16 -mt-8 rounded-full shadow-2xl transition-all duration-200
+          ${isActive("/") ? "bg-accent-500 text-white" : "bg-primary-500 text-white"}`}
+      >
+        <FaHome className="w-8 h-8" />
+      </Link>
 
-            <Link href="/tours" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/tours") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
-              <FaMapMarkedAlt className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-medium leading-none">Tours</span>
-            </Link>
+      {/* Tours */}
+      <Link 
+        href="/tours" 
+        className={`flex flex-col items-center gap-1 flex-1 transition-colors
+          ${isActive("/tours") ? "text-accent-500" : "text-gray-600 dark:text-gray-500"}`}
+      >
+        <FaMapMarkedAlt className="w-6 h-6" />
+        <span className="text-[10px] font-medium">Tours</span>
+      </Link>
 
-            <Link href="/booking" className={`flex flex-col items-center gap-1.5 flex-1 min-h-14 justify-center transition-colors ${isActive("/booking") ? "text-accent-500" : "text-gray-600 dark:text-gray-400"}`}>
-              <FaCalendarCheck className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-medium leading-none">Book</span>
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* Menu Button (opens slide menu) */}
+      <button
+        onClick={() => setMobileMenuOpen(true)}
+        className={`flex flex-col items-center gap-1 flex-1 transition-colors
+          ${mobileMenuOpen ? "text-accent-500" : "text-gray-600 dark:text-gray-500"}`}
+      >
+        <FaBars className="w-6 h-6" />
+        <span className="text-[10px] font-medium">Menu</span>
 
-      {/* Mobile Slide-In Menu */}
+      </button>
+
+    </div>
+  </div>
+</div>
+
+      {/* Mobile Slide-In Menu – Book button also removed */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -242,36 +245,20 @@ export default function Navbar() {
                 <nav className="space-y-2">
                   {navItems.map((item) => (
                     <Link
-                      key={item}
-                      href={getHref(item)}
+                      key={item.name}
+                      href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`block px-5 py-4 rounded-xl text-lg font-semibold transition ${
-                        isActive(getHref(item))
+                        isActive(item.href)
                           ? "bg-accent-500 text-white"
                           : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                       }`}
                     >
-                      {item}
+                      {item.name}
                     </Link>
                   ))}
-
-                  {/* Clean Book Now Button in Mobile Menu - No Ripple */}
-                  <div className="pt-6">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="block w-full">
-                      <Link
-                        href="/booking"
-                        className="relative overflow-hidden block w-full text-center text-xl py-5
-                          bg-gradient-to-r from-primary-500 to-accent-500 
-                          text-white font-bold rounded-full 
-                          shadow-lg hover:shadow-2xl transition-all duration-500
-                          group"
-                      >
-                        <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12 translate-x-[-300%] group-hover:translate-x-[300%] transition-transform duration-1200" />
-                        </span>
-                        <span className="relative z-10">Book Now</span>
-                      </Link>
-                    </motion.div>
+                  <div className="rounded-md bg-accent-500 flex justify-center py-2 w-full mx-auto">
+                  <ThemeToggle/>
                   </div>
                 </nav>
               </div>
